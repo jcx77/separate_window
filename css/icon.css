@@ -1,0 +1,13 @@
+.__iconSepWin{
+	display: block;
+	width: 22px;
+	height: 20px;
+	/*z-index:2147483647;*/
+	position: absolute;
+	background: url('chrome-extension://__MSG_@@extension_id__/img/icon.svg') 0;
+	cursor: pointer;
+	opacity: 0.5;
+}
+.__iconSepWin:hover{
+	opacity: 1;
+}

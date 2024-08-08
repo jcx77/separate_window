@@ -1,0 +1,210 @@
+BODY .__sepWin,
+BODY .__sepWin *,
+BODY .__sepWin button{
+	all: initial;
+}
+#__evt_panel button,
+#__btn_panel button
+{
+	all: initial;
+	line-height:0;
+}
+#__btn_panel{ 
+	right: 0;
+	width: 12px;
+}
+#__evt_panel{ 
+	left: 0;
+	width: 25px;
+}
+#__btn_panel,#__evt_panel{
+	min-height: 25px;
+	border-bottom-left-radius: 3px;
+	background-color: rgba(0,128,254,.55);
+	position: fixed;
+	top:0;
+	display: block;
+	opacity: 0.01;
+	overflow: hidden;
+	z-index:2147483647 !important;
+}
+#__evt_panel:hover {width: 32px;}
+#__btn_panel:hover {width: 30px;}
+#__btn_panel:hover,#__evt_panel:hover{
+	transition: width 0.3s 0.1s ease, height 0.15s 0.1s ease,opacity 0.3s 0.1s ease;
+	opacity: 1;
+}
+#__btn_panel:hover button, #__evt_panel:hover button{
+	display: block;
+}
+#__evt_panel.__evt_panel_blink{
+	animation: event_panel_blink 2s ease 0.5s 2 alternate;
+}
+#__btn_panel.__btn_panel_blink{
+	animation: btn_panel_blink 2s ease 0.5s 2 alternate;
+}
+button#__btn_back{
+	background: url('chrome-extension://__MSG_@@extension_id__/img/back.png') 0;
+}
+button#__btn_up{
+	background: url('chrome-extension://__MSG_@@extension_id__/img/btn_up.png') 0;	
+}
+button#__btn_dwn{
+	background: url('chrome-extension://__MSG_@@extension_id__/img/btn_dwn.png') 0;	
+}
+button#__btn_prsc{
+	background: url('chrome-extension://__MSG_@@extension_id__/img/camera.png') 0;		
+}
+button#__btn_link{
+	background: url('chrome-extension://__MSG_@@extension_id__/img/link.png') 0;		
+}
+button#__btn_resize.__btn_resize_on{
+	background: url('chrome-extension://__MSG_@@extension_id__/img/btn_resize_on.png') 0;
+}
+button#__btn_resize.__btn_resize_off{
+	background: url('chrome-extension://__MSG_@@extension_id__/img/btn_resize_off.png') 0;
+}
+button#__btn_player.__btn_player_on{
+	background: url('chrome-extension://__MSG_@@extension_id__/img/btn_player_on.png') 0;
+}
+button#__btn_player.__btn_player_off{
+	background: url('chrome-extension://__MSG_@@extension_id__/img/btn_player_off.png') 0;
+}
+
+button#__btn_back:hover,button#__btn_save:hover, button#__btn_up:hover,
+button#__btn_dwn:hover, button#__btn_prsc:hover,
+button#__btn_bkm:hover, button#__btn_link:hover, 
+button#__btn_resize:hover,button#__btn_player:hover{
+	opacity: 1;
+	background-color: initial;
+}
+button#__btn_up.disable:hover, button#__btn_dwn.disable:hover{
+	opacity: .3;
+}
+button#__btn_resize,button#__btn_player{
+	width:28px;
+	height: 28px;
+	margin: 2px;
+	display: block;
+	opacity: .3;
+	border:none;
+	cursor: pointer;
+}
+button#__btn_back, button#__btn_save, button#__btn_up,
+button#__btn_dwn, button#__btn_prsc,
+button#__btn_bkm, button#__btn_link{
+	width:26px;
+	height: 26px;
+	margin: 2px;
+	display: block;
+	opacity: .3;
+	border:none;
+	cursor: pointer;
+}
+button#__btn_bkm.btn_bkm_on{
+	background: url('chrome-extension://__MSG_@@extension_id__/img/bookmark_on.png') 0;
+}
+button#__btn_bkm.btn_bkm_off{
+	background: url('chrome-extension://__MSG_@@extension_id__/img/bookmark_off.png') 0;
+}
+button#__btn_save.btn_save_on{
+	background: url('chrome-extension://__MSG_@@extension_id__/img/save_size_on.png') 0;
+}
+button#__btn_save.btn_save_off{
+	background: url('chrome-extension://__MSG_@@extension_id__/img/save_size_off.png') 0;
+}
+
+#__win_link_overlay{
+	width: 100%;
+	height: 100%;
+	top:0;
+	left:0;
+	position: absolute;
+	z-index:2147483640 !important;
+	background-color: rgba(55,58,71,0.7);
+	animation: win_link_open 0.3s 1 ease-in-out;
+}
+#__win_link{
+	height: 150px;
+	width: 350px;
+	display: block;
+	z-index:2147483647 !important;
+	position: fixed;
+	top:10px;
+	left:0;
+	right: 0;
+	margin: 5% auto;
+	padding:10px; 
+	border-radius: 5px;
+	background: linear-gradient(to bottom right,rgba(170,230,255,1),rgba(50,145,175,1));
+    box-shadow:2px 2px 3px rgba(000,000,000,0.5),inset 0 0 2px rgba(255,255,255,0.7);
+}
+#__win_link DIV{
+	width: 100%;
+	height: 70%;
+	display: block;
+	margin: 5px auto;
+}
+#__win_link DIV TEXTAREA{
+	width: 98%;
+	height: 98%;
+	word-break: break-all;
+	background-color: white;
+	font-size: 12px;
+	padding: 1%;
+	border: 1px solid #00557d;
+}
+#__win_link BUTTON{
+	width: 50px;
+	height: 18px;
+	margin: 15px auto;
+	left:0;
+	right: 0;
+	display: block;
+	text-align: center;
+    padding: 3px 5px;
+    border-radius: 3px;
+    border: 1px solid #00557d;
+    color: #ffffff;
+    background: linear-gradient(to bottom right,#19b6ff,#0083ab);
+	box-shadow:0 1px 3px rgba(000,000,000,0.5),inset 0 0 2px rgba(255,255,255,0.7);
+	line-height:normal;
+}
+#__win_link BUTTON:hover{
+	cursor: pointer;
+	background: linear-gradient(to bottom right,#007DB7,#0083ab);
+}
+
+@keyframes event_panel_blink{
+	from{
+		opacity: 0.01;
+		width: 32px;
+	}50%{
+		opacity: 1;
+		width: 32px;
+	}to{
+		opacity: 0.01;
+		width: 32px;
+	}
+}
+@keyframes btn_panel_blink{
+	from{
+		opacity: 0.01;
+		width: 25px;
+	}50%{
+		opacity: 1;
+		width: 30px;
+	}to{
+		opacity: 0.01;
+		width: 25px;
+	}
+}
+@keyframes win_link_open{
+	from{
+		opacity: 0.5;
+		transform: scale3d(1.1,1.1,1.1);
+	}to{
+		opacity: 1;
+		transform: scale3d(1,1,1);
+	}
+}

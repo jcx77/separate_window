@@ -1,116 +1,116 @@
 {
 	"extDesc":{
-		"message":"Derive an arbitrary area of a page in a separate popup window"
+		"message":"在单独的弹出窗口中派生页面的任意区域"
 	},
 	"txtButtonChooseOff":{
-		"message":"Select"
+		"message":"选择"
 	},
 	"txtButtonChooseOn":{
-		"message":"Cancel"
+		"message":"取消"
 	},
 	"txtButtonPopTabOn":{
-		"message":"Entire Tab"
+		"message":"整个标签页"
 	},
 	"txtButtonPopTabOff":{
-		"message":"Entire Tab"
+		"message":"整个标签页"
 	},
 	"popHideAllIconOff":{
-		"message":"Show icons"
+		"message":"显示图标"
 	},
 	"popHideAllIconOn":{
-		"message":"Hide icons"
+		"message":"隐藏图标"
 	},
 	"popSwitchOff":{
-		"message":"Only popup window"
+		"message":"仅弹出窗口"
 	},
 	"popSwitchOn":{
-		"message":"Keep a tab open"
+		"message":"保持标签页打开"
 	},
 	"popRestoreCmnt":{
-		"message":"Restore:"
+		"message":"恢复："
 	},
 	"popRestoreOff":{
-		"message":"instead of duplicate"
+		"message":"而不是复制"
 	},
 	"popRestoreOn":{
-		"message":"as a new tab"
+		"message":"作为新标签页"
 	},
 	"popFocusOff":{
-		"message":"Set focus to popup"
+		"message":"将焦点设置到弹出窗口"
 	},
 	"popFocusOn":{
-		"message":"Keep focus"
+		"message":"保持焦点"
 	},
 	"showIcon":{
-		"message":"Show icon"
+		"message":"显示图标"
 	},
 	"delete":{
-		"message":"Delete"
+		"message":"删除"
 	},
 	"titleIcon":{
-		"message":"Put in a popup"
+		"message":"放入弹出窗口"
 	},
 	"txtHistory":{
-		"message":"Previous choice"
+		"message":"之前的选择"
 	},
 	"txtPosition":{
-		"message":"Window position"
+		"message":"窗口位置"
 	},
 	"txtLT":{
-		"message":"at the top left corner"
+		"message":"在左上角"
 	},
 	"txtRT":{
-		"message":"at the top right corner"
+		"message":"在右上角"
 	},
 	"txtLB":{
-		"message":"at the bottom left corner"
+		"message":"在左下角"
 	},
 	"txtRB":{
-		"message":"at the bottom right corner"
+		"message":"在右下角"
 	},
 	"txtAut":{
-		"message":"Auto"
+		"message":"自动"
 	},
 	"txtSize":{
-		"message":"Window size"
+		"message":"窗口大小"
 	},
 	"error":{
-		"message":"Reload this page"
+		"message":"重新加载此页面"
 	},
 	"PanelBack":{
-		"message":"Back to main window"
+		"message":"返回主窗口"
 	},
 	"PanelSaveSizeOff":{
-		"message":"Save size and position"
+		"message":"保存大小和位置"
 	},
 	"PanelSaveSizeOn":{
-		"message":"Delete the saved size and position"
+		"message":"删除保存的大小和位置"
 	},
 	"PanelScrollUp":{
-		"message":"Up to next element"
+		"message":"滚动到下一个元素"
 	},
 	"PanelScrollDown":{
-		"message":"Back to previous element"
+		"message":"滚动到上一个元素"
 	},
 	"PanelPrintScreen":{
-		"message":"Screenshot"
+		"message":"截图"
 	},
 	"PanelBookMarks":{
-		"message":"Add to bookmarks"
+		"message":"添加到书签"
 	},
 	"PanelGetLink":{
-		"message":"Get link"
+		"message":"获取链接"
 	},
 	"PanelLoadIframe":{
-		"message":"Switch to iframe"
+		"message":"切换到 iframe"
 	},
 	"PanelForcePlayerOn":{
-		"message":"Turn on the player"
+		"message":"打开播放器"
 	},
 	"PanelForcePlayerOff":{
-		"message":"Turn off the player"
+		"message":"关闭播放器"
 	},
 	"folderBookMarks":{
-		"message":"Separate windows"
+		"message":"单独窗口"
 	}
 }

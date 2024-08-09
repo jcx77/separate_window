@@ -1,4 +1,4 @@
-var Panel = {
+const Panel = {
 	cfg: {
 		isDuplicate: false,
 		isCopy: false,
@@ -9,51 +9,54 @@ var Panel = {
 		hideAllIcon: false
 	},
 	_moveTab: function (tabId, winId, index) {
-		chrome.tabs.move(tabId, { windowId: winId, index: index }, function (tab) {
-			if (!chrome.runtime.lastError) chrome.tabs.update(tab.id, { active: true });
+		chrome.tabs.move(tabId, { windowId: winId, index: index }).then(() => {
+			if (!chrome.runtime.lastError) {
+				chrome.tabs.update(tabId, { active: true });
+			}
 		});
 	},
 	createPop: function (tabId, size, windowSize) {
-		chrome.tabs.get(tabId, function (tab) {
+		chrome.tabs.get(tabId).then(tab => {
 			if (this.cfg.isDuplicate) {
-				chrome.windows.getCurrent(function (win) {
-					if (win.type == 'normal' && tab.url.indexOf('#sepwin') == -1) {
-						chrome.tabs.duplicate(tabId, function (dupTab) {
+				chrome.windows.getCurrent().then(win => {
+					if (win.type === 'normal' && tab.url.indexOf('#sepwin') === -1) {
+						chrome.tabs.duplicate(tabId).then(dupTab => {
 							newTabs.addDupId(tabId, dupTab.id);
 						});
 					}
 				});
 			}
-			chrome.windows.get(tab.windowId, {}, function (window) {
+			chrome.windows.get(tab.windowId).then(window => {
 				if (window.type !== 'popup') {
-					chrome.tabs.query({ windowId: window.id }, function (arrTab) {
-						if (arrTab.length == 1) {
+					chrome.tabs.query({ windowId: window.id }).then(arrTab => {
+						if (arrTab.length === 1) {
 							chrome.windows.create({
-								top: 		window.top,
-								left: 		window.left,
-								width: 		window.width,
-								height: 	window.height,
-								focused: 	!Panel.cfg.isFocus,
-								incognito: 	window.incognito
+								top: window.top,
+								left: window.left,
+								width: window.width,
+								height: window.height,
+								focused: !this.cfg.isFocus,
+								incognito: window.incognito
 							});
 						}
 					});
+
 					let left = null,
 						top = null,
-						position = Panel.cfg.position,
+						position = this.cfg.position,
 						width = size.width > 150 ? size.width : 150,
 						height = size.height > 150 ? size.height : 150,
 						aspect = width / height;
 
-					if (Panel.cfg.size.width !== 'Auto') {
-						width = Math.round(Panel.cfg.size.width);
-						if (Panel.cfg.size.height == 'Auto' && !size.entireTab) {
+					if (this.cfg.size.width !== 'Auto') {
+						width = Math.round(this.cfg.size.width);
+						if (this.cfg.size.height === 'Auto' && !size.entireTab) {
 							height = Math.round(width / aspect);
 						}
 					}
-					if (Panel.cfg.size.height !== 'Auto') {
-						height = Math.round(Panel.cfg.size.height);
-						if (Panel.cfg.size.width == 'Auto' && !size.entireTab) {
+					if (this.cfg.size.height !== 'Auto') {
+						height = Math.round(this.cfg.size.height);
+						if (this.cfg.size.width === 'Auto' && !size.entireTab) {
 							width = Math.round(height * aspect);
 						}
 					}
@@ -65,9 +68,9 @@ var Panel = {
 						left = Math.round(left);
 						top = Math.round(top);
 					}
-					if(windowSize){
+					if (windowSize) {
 						left = windowSize.left;
-						top	= windowSize.top;
+						top = windowSize.top;
 						width = windowSize.width;
 						height = windowSize.height;
 					}
@@ -77,27 +80,25 @@ var Panel = {
 						tabId: tabId,
 						width: width,
 						height: height,
-						focused: Panel.cfg.isFocus,
+						focused: this.cfg.isFocus,
 						type: 'popup',
 						incognito: window.incognito
-					},
-					function (window) {
-						newTabs.addNewWinId(tabId, window.id);
+					}).then(newWindow => {
+						newTabs.addNewWinId(tabId, newWindow.id);
 						SendMessage(tabId, { cmd: 'modifyURL', arg: false });
 					});
 				}
 			});
-		}.bind(this));
+		});
 	},
 	checkTab: function (tab) {
-			chrome.windows.get(tab.windowId, {}, function (window) {
-				if (window.type == 'popup') {
-					Panel.restoreTab(tab, false);
-				}
-			});
+		chrome.windows.get(tab.windowId).then(window => {
+			if (window.type === 'popup') {
+				this.restoreTab(tab, false);
+			}
+		});
 	},
-	restoreTab: function (tab, unload) {
-		unload = unload || false;
+	restoreTab: function (tab, unload = false) {
 		let incognito = tab.incognito;
 		let index = newTabs.find(tab.id);
 		let prop = {
@@ -107,33 +108,31 @@ var Panel = {
 		if (index > -1) {
 			prop = newTabs.get(tab.id);
 		}
-		chrome.windows.get(prop.winId, function (window) {
+		chrome.windows.get(prop.winId).then(window => {
 			if (!chrome.runtime.lastError && window) {
-				if (Panel.cfg.isDuplicate && !Panel.cfg.isCopy && !unload) {
-					chrome.tabs.get(prop.dupId, function (dupTab) {
-						var pos = -1;
+				if (this.cfg.isDuplicate && !this.cfg.isCopy && !unload) {
+					chrome.tabs.get(prop.dupId).then(dupTab => {
+						let pos = -1;
 						if (!chrome.runtime.lastError) {
 							pos = dupTab.index;
 							chrome.tabs.remove(prop.dupId);
 						}
-						Panel._moveTab(prop.tabId, window.id, pos);
+						this._moveTab(prop.tabId, window.id, pos);
 					});
 				} else {
-					Panel._moveTab(prop.tabId, window.id, -1);
+					this._moveTab(prop.tabId, window.id, -1);
 				}
 			} else {
-				chrome.windows.getAll({ windowTypes: ['normal'] }, function (allWin) {
-					let winId=-1;
-
-					for(var i=0;i<allWin.length;i++) {
-						if(allWin[i].incognito==incognito){
-							winId=allWin[i].id;
+				chrome.windows.getAll({ windowTypes: ['normal'] }).then(allWin => {
+					let winId = -1;
+					for (let i = 0; i < allWin.length; i++) {
+						if (allWin[i].incognito === incognito) {
+							winId = allWin[i].id;
 							break;
 						}
-					};
-
-					if (winId>-1){
-						Panel._moveTab(prop.tabId, winId, -1);
+					}
+					if (winId > -1) {
+						this._moveTab(prop.tabId, winId, -1);
 					} else {
 						chrome.windows.create({
 							tabId: prop.tabId,
@@ -148,15 +147,15 @@ var Panel = {
 		});
 		newTabs.remove(index);
 	},
-	updateWin:function(winId,state){
-		chrome.windows.update(winId, state, function (){});
+	updateWin: function (winId, state) {
+		chrome.windows.update(winId, state);
 	},
 	saveSetting: function () {
 		Storage.saveSetting({ cfg: this.cfg });
 	},
 	setSettings: function (items) {
 		if (items.hasOwnProperty('cfg')) {
-			for (var item in items.cfg) {
+			for (let item in items.cfg) {
 				if (this.cfg.hasOwnProperty(item)) this.cfg[item] = items.cfg[item];
 			}
 		}

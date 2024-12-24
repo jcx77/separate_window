@@ -1,3 +1,4 @@
+import { Storage } from './storage.js';
 export var Panel = {
 	cfg: {
 		isDuplicate: false,

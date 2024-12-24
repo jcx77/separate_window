@@ -35,23 +35,23 @@ var newTabs = {
 			};
 		}
 	},
-	getSelector(index) {
+	getSelector: function (index) {
 		return this.css[index];
 	},
-	replace(tabId, prop) {
-		const index = this.find(tabId);
+	replace: function (tabId, prop) {
+		var index = this.find(tabId);
 		this[prop.name][index] = prop.value;
 	},
-	findDuplicate(dupId) {
+	findDuplicate: function (dupId) {
 		return this.dupId.indexOf(dupId);
 	},
-	findNewWin(winId) {
+	findNewWin: function (winId) {
 		return this.newWinId.indexOf(winId);
 	},
-	find(tabId) {
+	find: function (tabId) {
 		return this.tabId.indexOf(tabId);
 	},
-	remove(index) {
+	remove: function (index) {
 		if (index == -1) return;
 		this.tabId.splice(index, 1);
 		this.css.splice(index, 1);
@@ -59,14 +59,13 @@ var newTabs = {
 		this.dupId.splice(index, 1);
 		this.newWinId.splice(index, 1);
 	},
-	removeUpdateTab(tabId) {
-		const index = this.updateTab.indexOf(tabId);
+	removeUpdateTab: function (tabId) {
+		let index = this.updateTab.indexOf(tabId);
 		if (index > -1) this.updateTab.splice(index, 1);
 	}
 };
 
-// 书签管理
-const Bookmarks = {
+var Bookmarks = {
 	bookmark: {
 		title: '',
 		url: '',
@@ -74,11 +73,11 @@ const Bookmarks = {
 	},
 	folderId: 0,
 	anchor: '#sepwin=',
-	addBookmark(tab, url) {
+	addBookmark: function (tab, url) {
 		this.bookmark.title = tab.title;
 		this.bookmark.url = url;
-		const folderName = chrome.i18n.getMessage('folderBookMarks');
-		chrome.bookmarks.search({ title: folderName }, (result) => {
+		var folderName = chrome.i18n.getMessage('folderBookMarks');
+		chrome.bookmarks.search({ title: folderName }, function (result) {
 			if (result == 0) {
 				chrome.bookmarks.create({
 					parentId: '1',
@@ -102,13 +101,17 @@ const Bookmarks = {
 			}
 		});
 	},
-	checkBookmark(tab, url, callback) {
-		chrome.bookmarks.search({ url: url }, (result) => {
-			callback(result.length > 0);
+	checkBookmark: function (tab, url, callback) {
+		chrome.bookmarks.search({ url: url }, function (result) {
+			if (result.length > 0) {
+				callback(true);
+			} else {
+				callback(false);
+			}
 		});
 	},
-	delBookmark(tab, url) {
-		chrome.bookmarks.search({ url: url }, (result) => {
+	delBookmark: function (tab, url) {
+		chrome.bookmarks.search({ url: url }, function (result) {
 			if (result.length > 0) {
 				chrome.bookmarks.remove(result[0].id);
 				SendMessage(tab.id, { cmd: 'isBookmark', arg: false });
@@ -117,14 +120,13 @@ const Bookmarks = {
 	}
 };
 
-// 处理来自标签页的命令
-const cmdFromTab = {
-	apply(arg, tab) {
+var cmdFromTab = {
+	apply: function (arg, tab) {
 		if (newTabs.find(tab.id) == -1) {
 			newTabs.add(tab.id, arg.selector, tab.windowId);
-			Storage.getSize(tab.url, arg.selector, (size) => {
-				let winSize = null;
-				if (size) {
+			Storage.getSize(tab.url,arg.selector,function(size){
+				var winSize = null;
+				if(size){
 					winSize = JSON.parse(size);
 				}
 				Panel.createPop(tab.id, arg.size, winSize);
@@ -132,77 +134,80 @@ const cmdFromTab = {
 			});
 		}
 	},
-	minimizeWin(arg, tab) {
-		Panel.updateWin(tab.windowId, { focused: false });
+	minimizeWin:function(arg,tab){
+		Panel.updateWin(tab.windowId,{focused:false});
 	},
-	restoreWin(arg, tab) {
-		Panel.updateWin(tab.windowId, { focused: true, state: 'normal' });
+	restoreWin:function(arg, tab){
+		Panel.updateWin(tab.windowId,{focused:true,state:'normal'});
 	},
-	saveProp(arg, tab) {
+	saveProp: function (arg, tab) {
 		Storage.saveProp(tab.url, arg.index, arg.prop);
 	},
-	saveSelector(arg, tab) {
-		const oldSelector = newTabs.get(tab.id).selector;
-		Storage.getAllSelectors(tab.url, (selectors) => {
-			const index = selectors.indexOf(oldSelector);
+	saveSelector: function (arg, tab) {
+		var oldSelector = newTabs.get(tab.id).selector;
+		Storage.getAllSelectors(tab.url, function (selectors) {
+			var index = selectors.indexOf(oldSelector);
 			Storage.saveProp(tab.url, index, arg.prop);
 			newTabs.replace(tab.id, arg.prop);
 		});
 	},
-	saveSize(arg, tab) {
-		const selector = newTabs.get(tab.id).selector;
-		Storage.getAllSelectors(tab.url, (selectors) => {
-			const index = selectors.indexOf(selector);
+	saveSize:function(arg,tab){
+		let selector = newTabs.get(tab.id).selector;
+		Storage.getAllSelectors(tab.url, function (selectors) {
+			let index = selectors.indexOf(selector);
 			Storage.saveProp(tab.url, index, arg.prop);
 		});
 	},
-	printScr(arg, tab) {
-		chrome.tabs.captureVisibleTab(tab.windowId, { format: 'png' }, (srcUrl) => {
+	printScr: function (arg, tab) {
+		chrome.tabs.captureVisibleTab(tab.windowId, { format: 'png' }, function (srcUrl) {
 			SendMessage(tab.id, { cmd: 'saveImage', arg: { data: srcUrl } });
 		});
 	},
-	fromHistory(index, tab) {
-		Storage.getItem(tab.url, index, (item) => {
+	fromHistory: function (index, tab) {
+		Storage.getItem(tab.url, index, function (item) {
 			SendMessage(tab.id, { cmd: 'apply', arg: item.selector });
 		});
 	},
-	getItems(arg, tab) {
-		Storage.getShowItems(tab.url, (icons) => {
+	getItems: function (arg, tab) {
+		Storage.getShowItems(tab.url, function (icons) {
 			SendMessage(tab.id, {
 				cmd: 'setItems',
 				arg: { icons: icons, hideIcons: Panel.cfg.hideAllIcon }
 			});
 		});
 	},
-	checkTab(arg, tab) {
+	checkTab: function (arg, tab) {
 		Panel.checkTab(tab);
 	},
-	cancel(arg, tab) {
-		Panel.restoreTab(tab, false);
+	cancel: function (arg, tab) {
+		Panel.restoreTab(tab,false);
 		this.getItems('', tab);
 	},
-	updatePage(arg, tab) {
+	updatePage: function (arg, tab) {
 		newTabs.updateTab.push(tab.id);
 	},
-	unloadPage(arg, tab) {
+	unloadPage: function (arg, tab) {
 		Panel.restoreTab(tab, true);
 		this.getItems('', tab);
 	},
-	addBookmark(arg, tab) {
+	addBookmark: function (arg, tab) {
 		Bookmarks.addBookmark(tab, arg.url);
 	},
-	delBookmark(arg, tab) {
+	delBookmark: function (arg, tab) {
 		Bookmarks.delBookmark(tab, arg.url);
 	},
-	checkBookmark(arg, tab) {
-		Bookmarks.checkBookmark(tab, arg.url, (result) => {
+	checkBookmark: function (arg, tab) {
+		Bookmarks.checkBookmark(tab, arg.url, function (result) {
 			SendMessage(tab.id, { cmd: 'isBookmark', arg: result });
 		});
 	},
-	checkSaveSize(arg, tab) {
-		Storage.getSize(tab.url, arg.selector, (size) => {
-			const isSaved = !!size;
-			SendMessage(tab.id, { cmd: 'isSavedSize', arg: isSaved });
+	checkSaveSize:function(arg,tab){
+		Storage.getSize(tab.url,arg.selector,function(size){
+			let isSaved = false;
+			if(size){
+				 isSaved = true;
+			}
+			SendMessage(tab.id,{cmd:'isSavedSize',arg:isSaved});
 		});
 	},
 	loadPlayer: function (arg, tab) {
@@ -219,55 +224,55 @@ const cmdFromTab = {
 			}
 		});
 	},
-	loadToFrame(arg, tab) {
-		chrome.webNavigation.getAllFrames({ tabId: tab.id }, (frames) => {
-			frames.forEach(frame => {
+	loadToFrame: function (arg, tab) {
+		chrome.webNavigation.getAllFrames({ tabId: tab.id }, function (frames) {
+			frames.map(function (frame) {
 				if (frame.parentFrameId > -1 && frame.url.indexOf('about:') == -1 && !frame.errorOccurred) {
-					chrome.scripting.executeScript({
-						target: { tabId: tab.id, frameIds: [frame.frameId] },
-						files: ['js/iframe.js']
-					});
+					chrome.tabs.executeScript(
+						tab.id, {
+							file: 'js/iframe.js', frameId: frame.frameId, runAt: 'document_start'
+						},
+						function () { });
 				}
 			});
 		});
 	},
-	isDuplicate(arg, tab) {
-		const i = newTabs.findDuplicate(tab.id);
+	isDuplicate: function (arg, tab) {
+		var i = newTabs.findDuplicate(tab.id);
 		if (i > -1) {
 			SendMessage(tab.id, { cmd: 'duplicate', arg: { selector: newTabs.getSelector(i) } });
 		}
 	}
 };
-
-// 监听来自其他脚本的消息
-chrome.runtime.onMessage.addListener((request, sender, callback) => {
-	if (request && sender && request.cmd && sender.tab) {
-		if (cmdFromTab.hasOwnProperty(request.cmd)) {
-			cmdFromTab[request.cmd](request.arg, sender.tab);
-			callback({ answer: true });
-		} else {
-			console.log(request.cmd);
+chrome.runtime.onMessage.addListener(function (request, sender, callback) {
+	if (request && sender) {
+		if (request.cmd && sender.tab) {
+			if (cmdFromTab.hasOwnProperty(request.cmd)) {
+				cmdFromTab[request.cmd](request.arg, sender.tab);
+				callback({ answer: true });
+			} else {
+				console.log(request.cmd);
+			}
 		}
 	}
 });
 
 function SendMessage(tabId, command) {
-	chrome.tabs.sendMessage(tabId, command);
+	chrome.tabs.sendMessage(tabId, command, function (response) {
+	});
 }
-
 function CheckURL() {
-	chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
+	chrome.tabs.query({ active: true, currentWindow: true }, function (tab) {
 		if (tab && tab[0] && tab[0].url) {
 			if (tab[0].url.indexOf('https://chrome.') == -1 &&
 				(tab[0].url.indexOf('http://') == 0 || tab[0].url.indexOf('https://') == 0 || tab[0].url.indexOf('chrome://newtab/') == 0)) {
 				chrome.browserAction.enable(tab[0].id);
 			} else {
-				chrome.browserAction.disable(tab[0].id);  ///v3独占
+				chrome.browserAction.disable(tab[0].id);
 			}
 		}
 	});
 }
-
 function ToggleContextMenu(tgl) {
 	chrome.contextMenus.update('start', {
 		'enabled': tgl
@@ -280,35 +285,36 @@ function ToggleContextMenu(tgl) {
 	});
 }
 
-// 监听标签页和窗口事件
-chrome.tabs.onRemoved.addListener((tabId, info) => {
+chrome.tabs.onRemoved.addListener(function (tabId, info) {
 	newTabs.remove(newTabs.find(tabId));
 	newTabs.removeUpdateTab(tabId);
 });
-
-chrome.tabs.onUpdated.addListener((id, info, tab) => {
+chrome.tabs.onUpdated.addListener(function (id, info, tab) {
 	if (info.hasOwnProperty('url')) { CheckURL(); }
-	const index = newTabs.updateTab.indexOf(tab.id);
-	if (tab.status === 'complete' && index > -1) {
+	let index = newTabs.updateTab.indexOf(tab.id);
+	if (tab.status == 'complete' && index > -1) {
 		newTabs.updateTab.splice(index, 1);
 		SendMessage(tab.id, { cmd: 'updateEntireTab' });
 	}
 });
-
-chrome.tabs.onActivated.addListener(() => {
+chrome.tabs.onActivated.addListener(function (info) {
 	CheckURL();
 });
 
-chrome.windows.onFocusChanged.addListener((winId) => {
-	chrome.windows.getCurrent((curWin) => {
+chrome.windows.onFocusChanged.addListener(function (winId) {
+	chrome.windows.getCurrent(function (curWin) {
 		if (curWin.id == winId) {
-			ToggleContextMenu(newTabs.findNewWin(winId) == -1);
+			if (newTabs.findNewWin(winId) != -1) {
+				ToggleContextMenu(false);
+			} else {
+				ToggleContextMenu(true);
+			}
 		}
 	});
 });
 
-chrome.runtime.onStartup.addListener(() => {
-	Storage.getSetting((itemsObj) => {
+chrome.runtime.onStartup.addListener(function () {
+	Storage.getSetting(function (itemsObj) {
 		if (itemsObj && itemsObj.hasOwnProperty('settings')) {
 			Panel.setSettings(itemsObj.settings);
 		}
@@ -334,14 +340,13 @@ chrome.contextMenus.onClicked.addListener(function (info, tab) {
 let contextMenuId = ['start', 'entireTab', 'back'];
 let contextMenuI18 = ['txtButtonChooseOff', 'txtButtonPopTabOff', 'PanelBack'];
 let contextMenuCfg = ['page', 'frame', 'selection', 'link', 'editable', 'image', 'video', 'audio'];
-// 创建上下文菜单
-chrome.contextMenus.removeAll(() => {
+chrome.contextMenus.removeAll(function () {
 	chrome.contextMenus.create({
 		'id': 'sepwin',
 		'title': 'Separate Window',
 		'contexts': contextMenuCfg
 	});
-	contextMenuId.forEach((item, i) => {
+	contextMenuId.forEach(function (item, i) {
 		chrome.contextMenus.create({
 			'id': item,
 			'parentId': 'sepwin',

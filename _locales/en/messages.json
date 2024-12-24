@@ -1,0 +1,116 @@
+{
+	"extDesc":{
+		"message":"Derive an arbitrary area of a page in a separate popup window"
+	},
+	"txtButtonChooseOff":{
+		"message":"Select"
+	},
+	"txtButtonChooseOn":{
+		"message":"Cancel"
+	},
+	"txtButtonPopTabOn":{
+		"message":"Entire Tab"
+	},
+	"txtButtonPopTabOff":{
+		"message":"Entire Tab"
+	},
+	"popHideAllIconOff":{
+		"message":"Show icons"
+	},
+	"popHideAllIconOn":{
+		"message":"Hide icons"
+	},
+	"popSwitchOff":{
+		"message":"Only popup window"
+	},
+	"popSwitchOn":{
+		"message":"Keep a tab open"
+	},
+	"popRestoreCmnt":{
+		"message":"Restore:"
+	},
+	"popRestoreOff":{
+		"message":"instead of duplicate"
+	},
+	"popRestoreOn":{
+		"message":"as a new tab"
+	},
+	"popFocusOff":{
+		"message":"Set focus to popup"
+	},
+	"popFocusOn":{
+		"message":"Keep focus"
+	},
+	"showIcon":{
+		"message":"Show icon"
+	},
+	"delete":{
+		"message":"Delete"
+	},
+	"titleIcon":{
+		"message":"Put in a popup"
+	},
+	"txtHistory":{
+		"message":"Previous choice"
+	},
+	"txtPosition":{
+		"message":"Window position"
+	},
+	"txtLT":{
+		"message":"at the top left corner"
+	},
+	"txtRT":{
+		"message":"at the top right corner"
+	},
+	"txtLB":{
+		"message":"at the bottom left corner"
+	},
+	"txtRB":{
+		"message":"at the bottom right corner"
+	},
+	"txtAut":{
+		"message":"Auto"
+	},
+	"txtSize":{
+		"message":"Window size"
+	},
+	"error":{
+		"message":"Reload this page"
+	},
+	"PanelBack":{
+		"message":"Back to main window"
+	},
+	"PanelSaveSizeOff":{
+		"message":"Save size and position"
+	},
+	"PanelSaveSizeOn":{
+		"message":"Delete the saved size and position"
+	},
+	"PanelScrollUp":{
+		"message":"Up to next element"
+	},
+	"PanelScrollDown":{
+		"message":"Back to previous element"
+	},
+	"PanelPrintScreen":{
+		"message":"Screenshot"
+	},
+	"PanelBookMarks":{
+		"message":"Add to bookmarks"
+	},
+	"PanelGetLink":{
+		"message":"Get link"
+	},
+	"PanelLoadIframe":{
+		"message":"Switch to iframe"
+	},
+	"PanelForcePlayerOn":{
+		"message":"Turn on the player"
+	},
+	"PanelForcePlayerOff":{
+		"message":"Turn off the player"
+	},
+	"folderBookMarks":{
+		"message":"Separate windows"
+	}
+}

@@ -1,0 +1,116 @@
+{
+	"extDesc":{
+		"message":"Выделите произвольную область страницы в отдельное всплывающее окно"
+	},
+	"txtButtonChooseOff":{
+		"message":"Выбрать"
+	},
+	"txtButtonChooseOn":{
+		"message":"Отменить"
+	},
+	"txtButtonPopTabOn":{
+		"message":"Всю вкладку"
+	},
+	"txtButtonPopTabOff":{
+		"message":"Всю вкладку"
+	},
+	"popHideAllIconOff":{
+		"message":"Показывать иконки"
+	},
+	"popHideAllIconOn":{
+		"message":"Не показывать иконки"
+	},
+	"popSwitchOff":{
+		"message":"Только окно"
+	},
+	"popSwitchOn":{
+		"message":"Окно и вкладка"
+	},
+	"popRestoreCmnt":{
+		"message":"Восстанавливать:"
+	},
+	"popRestoreOff":{
+		"message":"с заменой дубликата"
+	},
+	"popRestoreOn":{
+		"message":"в новую вкладку"
+	},
+	"popFocusOff":{
+		"message":"Фокус на окне"
+	},
+	"popFocusOn":{
+		"message":"Фокус на вкладке"
+	},
+	"showIcon":{
+		"message":"Показывать иконку"
+	},
+	"delete":{
+		"message":"Удалить"
+	},
+	"titleIcon":{
+		"message":"Выделить в окно"
+	},
+	"txtHistory":{
+		"message":"Предыдущий выбор"
+	},
+	"txtPosition":{
+		"message":"Позиция окна"
+	},
+	"txtLT":{
+		"message":"В левом верхнем углу"
+	},
+	"txtRT":{
+		"message":"В правом верхнем углу"
+	},
+	"txtLB":{
+		"message":"В левом нижнем углу"
+	},
+	"txtRB":{
+		"message":"В правом нижнем углу"
+	},
+	"txtAut":{
+		"message":"Авто"
+	},
+	"txtSize":{
+		"message":"Размер окна"
+	},
+	"error":{
+		"message":"Обновите вкладку"
+	},
+	"PanelBack":{
+		"message":"Назад на главное окно"
+	},
+	"PanelSaveSizeOff":{
+		"message":"Сохранить размер и позицию окна"
+	},
+	"PanelSaveSizeOn":{
+		"message":"Удалить сохраненные размер и позицию окна"
+	},
+	"PanelScrollUp":{
+		"message":"Вверх на следующий элемент"
+	},
+	"PanelScrollDown":{
+		"message":"Назад на предыдующий элемент"
+	},
+	"PanelPrintScreen":{
+		"message":"Скриншот"
+	},
+	"PanelBookMarks":{
+		"message":"Добавить в закладки"
+	},
+	"PanelGetLink":{
+		"message":"Получить ссылку"
+	},
+	"PanelLoadIframe":{
+		"message":"Обработать фрейм"
+	},
+	"PanelForcePlayerOn":{
+		"message":"Включить плеер"
+	},
+	"PanelForcePlayerOff":{
+		"message":"Выключить плеер"
+	},
+	"folderBookMarks":{
+		"message":"Отдельные окна"
+	}
+}

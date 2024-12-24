@@ -187,7 +187,7 @@ var __AppPanel = {
 			__Element.hideWrapper();
 			target = document.elementFromPoint(e.clientX, e.clientY);
 			if ('elementsFromPoint' in document) {
-			//Chrome 43
+				//Chrome 43
 				document.elementsFromPoint(e.clientX, e.clientY).forEach(function (element) {
 					switch (element.tagName.toUpperCase()) {
 						case 'VIDEO':

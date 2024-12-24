@@ -1,49 +1,59 @@
 {
-    "update_url": "https://clients2.google.com/service/update2/crx",
-
-    "manifest_version":2,
-	"minimum_chrome_version":"51",
-	"name":"Separate Window Test",
-    "short_name":"Sepwin",
-    "version":"0.0.1",
-    "offline_enabled":false,
-	"description":"__MSG_extDesc__",
-	"author":"Belousov Alexandr",
-	"default_locale":"en",
-    "icons":{
-        "16":"img/icon16.png",
-        "48":"img/icon48.png",
-        "128":"img/icon128.png"
-    },
-    "permissions":[
-        "tabs","storage","bookmarks","webNavigation","contextMenus","<all_urls>"
-    ],
-    "background":{
-        "persistent":true,
-        "scripts":["js/storage.js","js/bg_panel.js","js/background.js"]
-    },
-    "content_scripts":[{
-        "matches":[
-            "http://*/*",
-            "https://*/*"
-        ],
-		"all_frames": false,
-        "run_at":"document_start",
-        "css":["css/icon.css"],
-        "js":[
-            "js/elements.js",
-            "js/common.js",
-            "js/communication.js",
-            "js/icon.js",
-            "js/newWindow.js",
-            "js/mainApp.js",
-            "js/player.js"
-			]
-    }],
-    "web_accessible_resources": [
+  "update_url": "https://clients2.google.com/service/update2/crx",
+  "manifest_version": 3,
+  "minimum_chrome_version": "88",
+  "name": "Separate Window Test",
+  "short_name": "Sepwin",
+  "version": "0.0.1",
+  "offline_enabled": false,
+  "description": "__MSG_extDesc__",
+  "author": "Belousov Alexandr",
+  "default_locale": "en",
+  "icons": {
+    "16": "img/icon16.png",
+    "48": "img/icon48.png",
+    "128": "img/icon128.png"
+  },
+  "permissions": [
+    "tabs",
+    "storage",
+    "bookmarks",
+    "webNavigation",
+    "contextMenus"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "js/background.js",
+    "type": "module"  // 添加这一行，指定背景脚本是模块化
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "all_frames": false,
+      "run_at": "document_start",
+      "css": ["css/icon.css"],
+      "js": [
+        "js/elements.js",
+        "js/common.js",
+        "js/communication.js",
+        "js/icon.js",
+        "js/newWindow.js",
+        "js/mainApp.js",
+        "js/player.js"
+      ]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
         "js/iframe.js",
         "css/iframe.css",
-		"css/preview.css",
+        "css/preview.css",
         "css/window.css",
         "css/video.css",
         "css/panel.css",
@@ -77,10 +87,15 @@
         "img/save_size_off.png",
         "img/pip_off.png",
         "img/pip_on.png"
-    ],
-    "browser_action":{
-        "default_title":"Choose to separate window",
-        "default_icon":"img/icon128.png",
-        "default_popup":"popup.html"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
     }
+  ],
+  "action": {
+    "default_title": "Choose to separate window",
+    "default_icon": "img/icon128.png",
+    "default_popup": "popup.html"
+  }
 }

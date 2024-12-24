@@ -1,6 +1,9 @@
 /**
  * Author: Belousov Alexandr
  */
+
+import { Storage } from './storage.js';
+import { Panel } from './bg_panel.js';
 var newTabs = {
 	tabId: [],
 	css: [],
@@ -256,16 +259,21 @@ function SendMessage(tabId, command) {
 }
 
 function CheckURL() {
-	chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
-		if (tab && tab[0] && tab[0].url) {
-			if (tab[0].url.indexOf('https://chrome.') == -1 &&
-				(tab[0].url.indexOf('http://') == 0 || tab[0].url.indexOf('https://') == 0 || tab[0].url.indexOf('chrome://newtab/') == 0)) {
-				chrome.browserAction.enable(tab[0].id);
+	chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+		if (tabs && tabs[0] && tabs[0].url) {
+			const tab = tabs[0];
+			if (tab.url.indexOf('https://chrome.') === -1 &&
+				(tab.url.indexOf('http://') === 0 || tab.url.indexOf('https://') === 0 || tab.url.indexOf('chrome://newtab/') === 0)) {
+
+				// 使用 chrome.action 代替 chrome.browserAction
+				chrome.action.enable(tab.id);
 			} else {
-				chrome.browserAction.disable(tab[0].id);  ///v3独占
+				// 使用 chrome.action 代替 chrome.browserAction
+				chrome.action.disable(tab.id);
 			}
 		}
 	});
+
 }
 
 function ToggleContextMenu(tgl) {

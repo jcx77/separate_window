@@ -1,4 +1,4 @@
-var Panel = {
+export var Panel = {
 	cfg: {
 		isDuplicate: false,
 		isCopy: false,

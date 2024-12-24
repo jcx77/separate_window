@@ -2,54 +2,69 @@
  * Author: Belousov Alexandr
  */
 var i18 = chrome.i18n.getMessage;
-var Bg = chrome.extension.getBackgroundPage();
 var Tabs = chrome.tabs;
 
 var PopUp = {
 	_forEmptyTab: function () {
 		chrome.tabs.query({ active: true, currentWindow: true }, function (tab) {
-			if (tab[0].url.indexOf('chrome://newtab/') == 0) {
-				document.querySelectorAll('.wrap-buttons').forEach(
-					function (elem) {
-						elem.style.display = 'none';
-					});
+			if (tab[0].url.indexOf('chrome://newtab/') === 0) {
+				document.querySelectorAll('.wrap-buttons').forEach(function (elem) {
+					elem.style.display = 'none';
+				});
 				document.getElementById('advCfg').style.maxHeight = '550px';
 			} else {
 				this.sendCommand({ cmd: 'isRun' }, function (response) {
-					if (response == 'err') {
+					if (response === 'err') {
 						document.getElementById('error').style.display = 'block';
 						document.getElementById('main').style.display = 'none';
 					} else {
 						document.getElementById('select').checked = response;
 					}
-				});	
+				});
 			}
 		}.bind(this));
 	},
+
 	_loadSettings: function () {
 		this._forEmptyTab();
-		document.getElementById('duplicate').checked = Bg.Panel.cfg.isDuplicate;
-		document.getElementById('isCopy').checked = Bg.Panel.cfg.isCopy;
-		document.getElementById('focus').checked = !Bg.Panel.cfg.isFocus;
-		document.getElementById('hideAllIcon').checked = Bg.Panel.cfg.hideAllIcon;
-		document.getElementById('advSettings').checked = Bg.Panel.cfg.showAdvSettings;
-		let pos = Bg.Panel.cfg.position, size = Bg.Panel.cfg.size;
-		document.getElementById('width').value = size.width;
-		document.getElementById('height').value = size.height;
-		if (pos.auto) {
-			document.getElementById('auto').checked = true;
-		} else {
-			if (pos.left) {
-				pos.top ? document.getElementById('lftop').checked = true :
-					document.getElementById('lfbottom').checked = true;
-			} else {
-				pos.top ? document.getElementById('rgtop').checked = true :
-					document.getElementById('rgbottom').checked = true;
+		chrome.storage.local.get('PanelConfig', function (data) {
+			console.log(data);
+			console.error(data);
+			if (!data.PanelConfig) {
+				console.error('PanelConfig not found');
+				return;
 			}
-		}
-		this.toggleAdvSettings();
-		this.toggleDupCfg();
+
+			let cfg = data.PanelConfig;
+			document.getElementById('duplicate').checked = cfg.isDuplicate;
+			document.getElementById('isCopy').checked = cfg.isCopy;
+			document.getElementById('focus').checked = !cfg.isFocus; // !cfg.isFocus as per your original logic
+			document.getElementById('hideAllIcon').checked = cfg.hideAllIcon;
+			document.getElementById('advSettings').checked = cfg.showAdvSettings;
+
+			let pos = cfg.position;
+			let size = cfg.size;
+			document.getElementById('width').value = size.width || 'Auto';
+			document.getElementById('height').value = size.height || 'Auto';
+
+			// Position handling
+			if (pos.auto) {
+				document.getElementById('auto').checked = true;
+			} else {
+				if (pos.left) {
+					pos.top ? document.getElementById('lftop').checked = true :
+						document.getElementById('lfbottom').checked = true;
+				} else {
+					pos.top ? document.getElementById('rgtop').checked = true :
+						document.getElementById('rgbottom').checked = true;
+				}
+			}
+
+			this.toggleAdvSettings();
+			this.toggleDupCfg();
+		});
 	},
+
 	_localization: function () {
 		let elems = document.querySelectorAll('*[data-i18n]');
 		for (let elem of elems) {
@@ -65,6 +80,7 @@ var PopUp = {
 			}
 		}
 	},
+
 	_onClick: function (e) {
 		switch (e.target.id) {
 			case 'select':
@@ -75,8 +91,10 @@ var PopUp = {
 				break;
 			case 'advSettings':
 				this.toggleAdvSettings();
+				break;
 			case 'duplicate':
 				this.toggleDupCfg();
+				break;
 			case 'isCopy':
 			case 'focus':
 			case 'hideAllIcon':
@@ -87,6 +105,7 @@ var PopUp = {
 			default:
 				break;
 		}
+
 		switch (e.target.className) {
 			case 'name':
 				this.onButtons(e.target);
@@ -104,21 +123,20 @@ var PopUp = {
 				break;
 		}
 	},
+
 	_formHistory: function () {
 		this.getTab(function (tab) {
 			let last = document.getElementById('last'),
 				history = document.getElementById('history');
 
-			Bg.Storage.getItems(tab.url, function (itemObj) {
+			chrome.storage.local.get(tab.url, function (itemObj) {
 				if (itemObj) {
-					let items = itemObj;
+					let items = itemObj[tab.url];
 					history.style.display = 'block';
 					last.innerHTML = '';
 					for (let i = 0, len = items.css.length; i < len; ++i) {
-						let name = items.name[i];
-						let checked = '';
-						if (items.icon[i] == true) checked = 'checked';
-						if (name == '') name = 'Area #' + (i + 1);
+						let name = items.name[i] || 'Area #' + (i + 1);
+						let checked = items.icon[i] ? 'checked' : '';
 						last.innerHTML += '<div id="' + i + '" class="buttons" data-index="' + i + '">' +
 							'<div class="name" data-index="' + i + '">' + name + '</div>' +
 							'<div class="edit">' +
@@ -127,11 +145,11 @@ var PopUp = {
 							'</div>' +
 							'</div>';
 					}
-					document.querySelectorAll('.buttons').forEach(
-						function (button) {
-							button.addEventListener('mouseenter', this.switchOn.bind(PopUp));
-							button.addEventListener('mouseleave', this.switchOff.bind(PopUp));
-						}, PopUp);
+
+					document.querySelectorAll('.buttons').forEach(function (button) {
+						button.addEventListener('mouseenter', this.switchOn.bind(PopUp));
+						button.addEventListener('mouseleave', this.switchOff.bind(PopUp));
+					}, PopUp);
 				} else {
 					history.style.display = 'none';
 					last.innerHTML = '';
@@ -139,66 +157,83 @@ var PopUp = {
 			});
 		});
 	},
+
 	onCheckIcons: function (target) {
 		let index = target.getAttribute('data-index');
 		let prop = { name: 'icon', value: target.checked };
 		this.getTab(function (tab) {
-			Bg.Storage.saveProp(tab.url, index, prop);
-			Tabs.sendMessage(tab.id, { cmd: 'refreshIcon', arg: {} }, function (response) { });
+			chrome.storage.local.get(tab.url, function (itemsObj) {
+				itemsObj[tab.url].icon[index] = target.checked;
+				chrome.storage.local.set({ [tab.url]: itemsObj[tab.url] });
+			});
+			Tabs.sendMessage(tab.id, { cmd: 'refreshIcon', arg: {} }, function (response) {});
 		});
 	},
+
 	onButtons: function (target) {
 		let index = target.getAttribute('data-index');
 		this.getTab(function (tab) {
-			Bg.cmdFromTab.fromHistory(index, tab);
+			chrome.runtime.sendMessage({ cmd: 'fromHistory', index: index, tabId: tab.id });
 		});
 	},
+
 	onDelete: function (target) {
 		let index = target.getAttribute('data-index');
 		this.getTab(function (tab) {
-			Bg.Storage.delItem(tab.url, index, function () {
-				PopUp._formHistory();
-				Tabs.sendMessage(tab.id, { cmd: 'refreshIcon', arg: {} }, function (response) { });
+			chrome.storage.local.get(tab.url, function (itemsObj) {
+				itemsObj[tab.url].css.splice(index, 1);
+				itemsObj[tab.url].name.splice(index, 1);
+				itemsObj[tab.url].icon.splice(index, 1);
+				itemsObj[tab.url].size.splice(index, 1);
+				chrome.storage.local.set({ [tab.url]: itemsObj[tab.url] }, function () {
+					PopUp._formHistory();
+					Tabs.sendMessage(tab.id, { cmd: 'refreshIcon', arg: {} }, function (response) {});
+				});
 			});
 		});
 	},
+
 	onPopTab: function () {
-		this.sendCommand({ cmd: 'entireTab' },
-			function (answer) {
-				if (answer) window.close();
-			}
-		);
+		this.sendCommand({ cmd: 'entireTab' }, function (answer) {
+			if (answer) window.close();
+		});
 	},
+
 	onSelect: function () {
 		if (document.getElementById('select').checked) {
-			this.sendCommand({ cmd: 'start' },
-				function (answer) {
-					window.close();
-				}
-			);
+			this.sendCommand({ cmd: 'start' }, function (answer) {
+				window.close();
+			});
 		} else {
-			this.sendCommand({ cmd: 'stop' },function(response){});
+			this.sendCommand({ cmd: 'stop' }, function(response) {});
 		}
 	},
+
 	switchOn: function (e) {
 		let index = e.target.getAttribute('data-index');
 		this.getTab(function (tab) {
-			Bg.Storage.getItem(tab.url, index, function (item) {
-				Tabs.sendMessage(tab.id, { cmd: 'switchOn', arg: { css: item.selector } });
+			chrome.storage.local.get(tab.url, function (itemsObj) {
+				Tabs.sendMessage(tab.id, { cmd: 'switchOn', arg: { css: itemsObj[tab.url].css[index] } });
 			});
 		});
 	},
+
 	switchOff: function () {
-		this.sendCommand({ cmd: 'switchOff', arg: {} },function(response){});
+		this.sendCommand({ cmd: 'switchOff', arg: {} }, function(response) {});
 	},
+
 	saveSettings: function () {
-		Bg.Panel.cfg.isDuplicate = document.getElementById('duplicate').checked;
-		Bg.Panel.cfg.isCopy = document.getElementById('isCopy').checked;
-		Bg.Panel.cfg.isFocus = !document.getElementById('focus').checked;
-		Bg.Panel.cfg.hideAllIcon = document.getElementById('hideAllIcon').checked;
-		Bg.Panel.cfg.size.width = document.getElementById('width').value;
-		Bg.Panel.cfg.size.height = document.getElementById('height').value;
-		Bg.Panel.cfg.showAdvSettings = document.getElementById('advSettings').checked;
+		let cfg = {};
+		cfg.isDuplicate = document.getElementById('duplicate').checked;
+		cfg.isCopy = document.getElementById('isCopy').checked;
+		cfg.isFocus = !document.getElementById('focus').checked;  // Inverted logic
+		cfg.hideAllIcon = document.getElementById('hideAllIcon').checked;
+		cfg.size = {
+			width: document.getElementById('width').value,
+			height: document.getElementById('height').value
+		};
+		cfg.showAdvSettings = document.getElementById('advSettings').checked;
+
 		let pos = { left: 0, top: 0, auto: 0 };
 		if (document.getElementById('auto').checked) {
 			pos.auto = 1;
@@ -210,14 +245,17 @@ var PopUp = {
 				pos.left = 1;
 			}
 		}
-		if (Bg.Panel.cfg.hideAllIcon) {
-			this.sendCommand({ cmd: 'hideAllIcons', arg: {} },function(response){});
+		cfg.position = pos;
+
+		chrome.storage.local.set({ PanelConfig: cfg });
+
+		if (cfg.hideAllIcon) {
+			this.sendCommand({ cmd: 'hideAllIcons', arg: {} }, function(response) {});
 		} else {
-			this.sendCommand({ cmd: 'refreshIcon', arg: {} },function(response){});
+			this.sendCommand({ cmd: 'refreshIcon', arg: {} }, function(response) {});
 		}
-		Bg.Panel.cfg.position = pos;
-		Bg.Panel.saveSetting();
 	},
+
 	toggleAdvSettings: function () {
 		if (document.getElementById('advSettings').checked) {
 			document.getElementById('advCfg').style.maxHeight = '550px';
@@ -225,6 +263,7 @@ var PopUp = {
 			document.getElementById('advCfg').style.maxHeight = '0';
 		}
 	},
+
 	toggleDupCfg: function () {
 		if (document.getElementById('duplicate').checked) {
 			document.getElementById('restTab').style.display = 'block';
@@ -232,19 +271,22 @@ var PopUp = {
 			document.getElementById('restTab').style.display = 'none';
 		}
 	},
+
 	init: function () {
 		this._loadSettings();
 		this._localization();
 		this._formHistory();
 		document.body.addEventListener('click', this._onClick.bind(PopUp));
 	},
+
 	getTab: function (callback) {
-		Tabs.query({ active: true, currentWindow: true }, function (tab) { callback(tab[0]); });
+		Tabs.query({ active: true, currentWindow: true }, function (tabs) { callback(tabs[0]); });
 	},
+
 	sendCommand: function (command, callback) {
 		this.getTab(function (tab) {
 			Tabs.sendMessage(tab.id, command, function (response) {
-				if (typeof (response) == 'undefined') {
+				if (typeof (response) === 'undefined') {
 					callback('err');
 				} else {
 					callback(response);

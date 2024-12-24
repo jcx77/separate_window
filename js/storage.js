@@ -2,7 +2,7 @@
  * Author: Belousov Alexandr
  */
 var storage = chrome.storage.local;
-var Storage = {
+export var Storage = {
 	prop:['css','name','icon','size'],
 	_setItems: function (url, items) {
 		if (items.css.length == 0) {

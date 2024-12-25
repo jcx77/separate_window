@@ -4,6 +4,19 @@
 var i18 = chrome.i18n.getMessage;
 var Tabs = chrome.tabs;
 import { Storage } from './storage.js';
+
+var popup_Panel = {
+    cfg: {
+        isDuplicate: false,
+        isCopy: false,
+        isFocus: true,
+        position: { left: 0, top: 0, auto: 1 },
+        size: { width: 'Auto', height: 'Auto' },
+        showAdvSettings: false,
+        hideAllIcon: false
+    }
+};
+
 var PopUp = {
     _forEmptyTab: function () {
         chrome.tabs.query({active: true, currentWindow: true}, function (tab) {
@@ -58,13 +71,13 @@ var PopUp = {
 
 
         chrome.runtime.sendMessage({cmd: 'getPanelConfig'}, function (response) {
-           // console.log('tab.id', tab.id);
             console.log('获取到的设置信息为：', response);
             if (!response.panel) {
                 console.error('Panel not found');
                 return;
             }
             let cfg = response.panel.cfg;
+            popup_Panel.cfg = response.panel.cfg
             document.getElementById('duplicate').checked = cfg.isDuplicate;
             document.getElementById('isCopy').checked = cfg.isCopy;
             document.getElementById('focus').checked = !cfg.isFocus; // !cfg.isFocus as per your original logic
@@ -249,13 +262,15 @@ var PopUp = {
 
     saveSettings: function () {
         console.log('saveSettings');
-        Panel.cfg.isDuplicate = document.getElementById('duplicate').checked;
-        Panel.cfg.isCopy = document.getElementById('isCopy').checked;
-        Panel.cfg.isFocus = !document.getElementById('focus').checked;
-        Panel.cfg.hideAllIcon = document.getElementById('hideAllIcon').checked;
-        Panel.cfg.size.width = document.getElementById('width').value;
-        Panel.cfg.size.height = document.getElementById('height').value;
-        Panel.cfg.showAdvSettings = document.getElementById('advSettings').checked;
+        console.log(popup_Panel);
+        console.log(document.getElementById('duplicate').checked);
+        popup_Panel.cfg.isDuplicate = document.getElementById('duplicate').checked;
+        popup_Panel.cfg.isCopy = document.getElementById('isCopy').checked;
+        popup_Panel.cfg.isFocus = !document.getElementById('focus').checked;
+        popup_Panel.cfg.hideAllIcon = document.getElementById('hideAllIcon').checked;
+        popup_Panel.cfg.size.width = document.getElementById('width').value;
+        popup_Panel.cfg.size.height = document.getElementById('height').value;
+        popup_Panel.cfg.showAdvSettings = document.getElementById('advSettings').checked;
         let pos = { left: 0, top: 0, auto: 0 };
         if (document.getElementById('auto').checked) {
             pos.auto = 1;
@@ -267,14 +282,21 @@ var PopUp = {
                 pos.left = 1;
             }
         }
-        if (Panel.cfg.hideAllIcon) {
+        if (popup_Panel.cfg.hideAllIcon) {
             this.sendCommand({ cmd: 'hideAllIcons', arg: {} },function(response){});
         } else {
             this.sendCommand({ cmd: 'refreshIcon', arg: {} },function(response){});
         }
-        Panel.cfg.position = pos;
-        console.log(Panel.cfg);
-        Panel.saveSetting();
+        popup_Panel.cfg.position = pos;
+        console.log(popup_Panel.cfg);
+        //Panel.saveSetting();
+
+        chrome.runtime.sendMessage({cmd: 'savePanelConfig',arg:popup_Panel}, function (response) {
+            // console.log('tab.id', tab.id);
+            console.log('获取到的设置信息为：', response);
+
+        });
+
 
 /*        let cfg = {};
         cfg.isDuplicate = document.getElementById('duplicate').checked;

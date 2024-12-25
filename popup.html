@@ -24,8 +24,6 @@
             <label id="btnAdvSettings" for="advSettings" class="button icon-cfg" data-i18n="txtButtonSettings"></label>
         </div>
         <div id="advCfg" class="wrap-settings">
-            <!-- Settings toggle inputs -->
-            <!-- Add the switch configuration here -->
             <div class="switch">
                 <input type="checkbox" class="switch-checkbox" id="duplicate">
                 <label id="btnDuplicate" class="switch-label" for="duplicate">
@@ -33,7 +31,117 @@
                     <span class="switch-switch"></span>
                 </label>
             </div>
-            <!-- More Settings can be added below -->
+            <div id="restTab" class="switch">
+                <span id="cmntRestore" class="comment" data-i18n="popRestoreCmnt"></span>
+                <input type="checkbox" class="switch-checkbox" id="isCopy">
+                <label class="switch-label" for="isCopy">
+                    <span id="txtRestore" class="switch-inner" data-i18n="popRestore"></span>
+                    <span class="switch-switch"></span>
+                </label>
+            </div>
+            <div class="switch">
+                <input type="checkbox" class="switch-checkbox" id="focus">
+                <label class="switch-label" for="focus">
+                    <span id="txtFocus" class="switch-inner" data-i18n="popFocus"></span>
+                    <span class="switch-switch"></span>
+                </label>
+            </div>
+            <div class="switch">
+                <input type="checkbox" class="switch-checkbox" id="hideAllIcon">
+                <label id="btnDuplicate" class="switch-label" for="hideAllIcon">
+                    <span id="txtSwitch" class="switch-inner" data-i18n="popHideAllIcon"></span>
+                    <span class="switch-switch"></span>
+                </label>
+            </div>
+
+            <div class="wrap-position">
+                <span id="positionTxt" class="comment separator" data-i18n="txtPosition"></span>
+                <div class="screen">
+                    <div id="win1" class="window">
+                        <label class="radio-label">
+                            <input type="radio" name="position" class="switch-position" id="lftop">
+                            <span id="txtLT" class="mark" data-i18n="txtLT" ></span>
+                        </label>
+                    </div>
+                    <div id="win2" class="window"></div>
+                    <div id="win3" class="window">
+                        <label class="radio-label">
+                            <input type="radio" name="position" class="switch-position" id="rgtop">
+                            <span id="txtRT" class="mark" data-i18n="txtRT"></span>
+                        </label>
+                    </div>
+                    <div id="win4" class="window"></div>
+                    <div id="win5" class="window">
+                        <label class="radio-label">
+                            <input type="radio" name="position" class="switch-position" id="auto">
+                            <span id="txtAut" class="mark" data-i18n="txtAut"></span>
+                        </label>
+                    </div>
+                    <div id="win6" class="window"></div>
+                    <div id="win7" class="window">
+                        <label class="radio-label">
+                            <input type="radio" name="position" class="switch-position" id="lfbottom">
+                            <span id="txtLB" class="mark" data-i18n="txtLB"></span>
+                        </label>
+                    </div>
+                    <div id="win8" class="window"></div>
+                    <div id="win9" class="window">
+                        <label class="radio-label">
+                            <input type="radio" name="position" class="switch-position" id="rgbottom">
+                            <span id="txtRB" class="mark" data-i18n="txtRB"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="wrap-window-size">
+                <span id="sizeTxt" class="comment separator" data-i18n="txtSize"></span>
+                <div class="wrap-size">
+                    <div class="wrap-option">
+                        <select id="width" class="size">
+                            <option>Auto</option>
+                            <option>240</option>
+                            <option>320</option>
+                            <option>360</option>
+                            <option>384</option>
+                            <option>480</option>
+                            <option>540</option>
+                            <option>576</option>
+                            <option>600</option>
+                            <option>640</option>
+                            <option>720</option>
+                            <option>768</option>
+                            <option>800</option>
+                            <option>864</option>
+                            <option>900</option>
+                            <option>960</option>
+                            <option>1024</option>
+                        </select>
+                    </div>
+                    <div id="x" class="wrap-option">X</div>
+                    <div class="wrap-option">
+                        <select id="height" class="size">
+                            <option>Auto</option>
+                            <option>240</option>
+                            <option>320</option>
+                            <option>360</option>
+                            <option>384</option>
+                            <option>480</option>
+                            <option>540</option>
+                            <option>576</option>
+                            <option>600</option>
+                            <option>640</option>
+                            <option>720</option>
+                            <option>768</option>
+                            <option>800</option>
+                            <option>864</option>
+                            <option>900</option>
+                            <option>960</option>
+                            <option>1024</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <div id="history" class="wrap-history">

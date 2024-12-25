@@ -24,6 +24,7 @@
   "host_permissions": [
     "<all_urls>"
   ],
+  // 下面将出现的background.js 配置service work
   "background": {
     "service_worker": "js/background.js",
     "type": "module"  // 添加这一行，指定背景脚本是模块化
@@ -92,9 +93,9 @@
         "<all_urls>"
       ]
     }
-  ],
+  ],// 『重点』action配置项主要用于点击图标弹出框，对于弹出框接受的是html文件
   "action": {
-    "default_title": "Choose to separate window",
+    "default_title": "请选择分离窗口",
     "default_icon": "img/icon128.png",
     "default_popup": "popup.html"
   }

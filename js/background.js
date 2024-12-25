@@ -245,6 +245,7 @@ const cmdFromTab = {
 // 监听来自其他脚本的消息
 chrome.runtime.onMessage.addListener((request, sender, callback) => {
 	if (request && sender && request.cmd && sender.tab) {
+
 		if (cmdFromTab.hasOwnProperty(request.cmd)) {
 			cmdFromTab[request.cmd](request.arg, sender.tab);
 			callback({ answer: true });

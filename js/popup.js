@@ -3,8 +3,6 @@
  */
 var i18 = chrome.i18n.getMessage;
 var Tabs = chrome.tabs;
-import {panel} from './bg_panel';
-
 var PopUp = {
     _forEmptyTab: function () {
         chrome.tabs.query({active: true, currentWindow: true}, function (tab) {
@@ -29,40 +27,43 @@ var PopUp = {
     _loadSettings: function () {
         this._forEmptyTab();
 
-
-
-        if (!panel) {
-            console.error('Panel not found');
-            return;
-        }
-
-        let cfg = panel.cfg;
-        document.getElementById('duplicate').checked = cfg.isDuplicate;
-        document.getElementById('isCopy').checked = cfg.isCopy;
-        document.getElementById('focus').checked = !cfg.isFocus; // !cfg.isFocus as per your original logic
-        document.getElementById('hideAllIcon').checked = cfg.hideAllIcon;
-        document.getElementById('advSettings').checked = cfg.showAdvSettings;
-
-        let pos = cfg.position;
-        let size = cfg.size;
-        document.getElementById('width').value = size.width || 'Auto';
-        document.getElementById('height').value = size.height || 'Auto';
-
-        // Position handling
-        if (pos.auto) {
-            document.getElementById('auto').checked = true;
-        } else {
-            if (pos.left) {
-                pos.top ? document.getElementById('lftop').checked = true :
-                    document.getElementById('lfbottom').checked = true;
-            } else {
-                pos.top ? document.getElementById('rgtop').checked = true :
-                    document.getElementById('rgbottom').checked = true;
+        chrome.runtime.sendMessage({cmd: 'getPanelConfig'}, function (response) {
+           // console.log('tab.id', tab.id);
+            console.log('获取到的设置信息为：', response);
+            if (!response.panel) {
+                console.error('Panel not found');
+                return;
             }
-        }
+            debugger;
+            let cfg = response.panel.cfg;
+            document.getElementById('duplicate').checked = cfg.isDuplicate;
+            document.getElementById('isCopy').checked = cfg.isCopy;
+            document.getElementById('focus').checked = !cfg.isFocus; // !cfg.isFocus as per your original logic
+            document.getElementById('hideAllIcon').checked = cfg.hideAllIcon;
+            document.getElementById('advSettings').checked = cfg.showAdvSettings;
 
-        this.toggleAdvSettings();
-        this.toggleDupCfg();
+            let pos = cfg.position;
+            let size = cfg.size;
+            document.getElementById('width').value = size.width || 'Auto';
+            document.getElementById('height').value = size.height || 'Auto';
+
+            // Position handling
+            if (pos.auto) {
+                document.getElementById('auto').checked = true;
+            } else {
+                if (pos.left) {
+                    pos.top ? document.getElementById('lftop').checked = true :
+                        document.getElementById('lfbottom').checked = true;
+                } else {
+                    pos.top ? document.getElementById('rgtop').checked = true :
+                        document.getElementById('rgbottom').checked = true;
+                }
+            }
+            console.log(this);
+            PopUp.toggleAdvSettings();
+            PopUp.toggleDupCfg();
+        });
+
 
     },
 
@@ -127,10 +128,11 @@ var PopUp = {
         this.getTab(function (tab) {
             let last = document.getElementById('last'),
                 history = document.getElementById('history');
-
+            console.log(tab.url);
             chrome.storage.local.get(tab.url, function (itemObj) {
                 if (itemObj) {
                     let items = itemObj[tab.url];
+                    console.log(items);
                     history.style.display = 'block';
                     last.innerHTML = '';
                     for (let i = 0, len = items.css.length; i < len; ++i) {
@@ -161,6 +163,7 @@ var PopUp = {
         let index = target.getAttribute('data-index');
         let prop = {name: 'icon', value: target.checked};
         this.getTab(function (tab) {
+            console.log("this.getTab tab.id"+tab.id);
             chrome.storage.local.get(tab.url, function (itemsObj) {
                 itemsObj[tab.url].icon[index] = target.checked;
                 chrome.storage.local.set({[tab.url]: itemsObj[tab.url]});

@@ -315,7 +315,7 @@ chrome.tabs.onActivated.addListener(() => {
 chrome.windows.onFocusChanged.addListener((winId) => {
 	console.log('chrome.windows.onFocusChanged.addListener');
 	chrome.windows.getCurrent((curWin) => {
-		console.log(curWin);
+		//console.log(curWin);
 		if (curWin.id == winId) {
 			ToggleContextMenu(newTabs.findNewWin(winId) == -1);
 		}
@@ -326,6 +326,7 @@ chrome.runtime.onStartup.addListener(() => {
 	console.log('chrome.runtime.onStartup.addListener');
 	Storage.getSetting((itemsObj) => {
 		if (itemsObj && itemsObj.hasOwnProperty('settings')) {
+			console.log(itemsObj.settings);
 			Panel.setSettings(itemsObj.settings);
 		}
 	});

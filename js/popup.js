@@ -29,6 +29,7 @@ var PopUp = {
 
     _loadSettings: function () {
         this._forEmptyTab();
+        /*console.log(Panel.cfg);
         let cfg = Panel.cfg;
         document.getElementById('duplicate').checked = cfg.isDuplicate;
         document.getElementById('isCopy').checked = cfg.isCopy;
@@ -54,18 +55,17 @@ var PopUp = {
             }
         }
         PopUp.toggleAdvSettings();
-        PopUp.toggleDupCfg();
+        PopUp.toggleDupCfg();*/
 
 
 
-        /*chrome.runtime.sendMessage({cmd: 'getPanelConfig'}, function (response) {
+        chrome.runtime.sendMessage({cmd: 'getPanelConfig'}, function (response) {
            // console.log('tab.id', tab.id);
             console.log('获取到的设置信息为：', response);
             if (!response.panel) {
                 console.error('Panel not found');
                 return;
             }
-            debugger;
             let cfg = response.panel.cfg;
             document.getElementById('duplicate').checked = cfg.isDuplicate;
             document.getElementById('isCopy').checked = cfg.isCopy;
@@ -90,10 +90,10 @@ var PopUp = {
                         document.getElementById('rgbottom').checked = true;
                 }
             }
-            console.log(this);
+
             PopUp.toggleAdvSettings();
             PopUp.toggleDupCfg();
-        });*/
+        });
 
 
     },
@@ -122,10 +122,8 @@ var PopUp = {
                 break;
             case 'advSettings':
                 this.toggleAdvSettings();
-                break;
             case 'duplicate':
                 this.toggleDupCfg();
-                break;
             case 'isCopy':
             case 'focus':
             case 'hideAllIcon':
@@ -252,7 +250,7 @@ var PopUp = {
     },
 
     saveSettings: function () {
-
+        console.log('saveSettings');
         Panel.cfg.isDuplicate = document.getElementById('duplicate').checked;
         Panel.cfg.isCopy = document.getElementById('isCopy').checked;
         Panel.cfg.isFocus = !document.getElementById('focus').checked;
@@ -277,6 +275,7 @@ var PopUp = {
             this.sendCommand({ cmd: 'refreshIcon', arg: {} },function(response){});
         }
         Panel.cfg.position = pos;
+        console.log(Panel.cfg);
         Panel.saveSetting();
 
 /*        let cfg = {};

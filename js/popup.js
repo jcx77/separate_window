@@ -4,8 +4,6 @@
 var i18 = chrome.i18n.getMessage;
 var Tabs = chrome.tabs;
 import { Storage } from './storage.js';
-import { cmdFromTab } from './background.js';
-import { Panel } from './bg_panel.js';
 var PopUp = {
     _forEmptyTab: function () {
         chrome.tabs.query({active: true, currentWindow: true}, function (tab) {
@@ -29,33 +27,33 @@ var PopUp = {
 
     _loadSettings: function () {
         this._forEmptyTab();
-        /*console.log(Panel.cfg);
-        let cfg = Panel.cfg;
-        document.getElementById('duplicate').checked = cfg.isDuplicate;
-        document.getElementById('isCopy').checked = cfg.isCopy;
-        document.getElementById('focus').checked = !cfg.isFocus; // !cfg.isFocus as per your original logic
-        document.getElementById('hideAllIcon').checked = cfg.hideAllIcon;
-        document.getElementById('advSettings').checked = cfg.showAdvSettings;
-
-        let pos = cfg.position;
-        let size = cfg.size;
-        document.getElementById('width').value = size.width || 'Auto';
-        document.getElementById('height').value = size.height || 'Auto';
-
-        // Position handling
-        if (pos.auto) {
-            document.getElementById('auto').checked = true;
-        } else {
-            if (pos.left) {
-                pos.top ? document.getElementById('lftop').checked = true :
-                    document.getElementById('lfbottom').checked = true;
-            } else {
-                pos.top ? document.getElementById('rgtop').checked = true :
-                    document.getElementById('rgbottom').checked = true;
-            }
-        }
-        PopUp.toggleAdvSettings();
-        PopUp.toggleDupCfg();*/
+        // console.log(Panel.cfg);
+        // let cfg = Panel.cfg;
+        // document.getElementById('duplicate').checked = cfg.isDuplicate;
+        // document.getElementById('isCopy').checked = cfg.isCopy;
+        // document.getElementById('focus').checked = !cfg.isFocus; // !cfg.isFocus as per your original logic
+        // document.getElementById('hideAllIcon').checked = cfg.hideAllIcon;
+        // document.getElementById('advSettings').checked = cfg.showAdvSettings;
+        //
+        // let pos = cfg.position;
+        // let size = cfg.size;
+        // document.getElementById('width').value = size.width || 'Auto';
+        // document.getElementById('height').value = size.height || 'Auto';
+        //
+        // // Position handling
+        // if (pos.auto) {
+        //     document.getElementById('auto').checked = true;
+        // } else {
+        //     if (pos.left) {
+        //         pos.top ? document.getElementById('lftop').checked = true :
+        //             document.getElementById('lfbottom').checked = true;
+        //     } else {
+        //         pos.top ? document.getElementById('rgtop').checked = true :
+        //             document.getElementById('rgbottom').checked = true;
+        //     }
+        // }
+        // PopUp.toggleAdvSettings();
+        // PopUp.toggleDupCfg();
 
 
 

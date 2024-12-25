@@ -245,6 +245,7 @@ var cmdFromTab = {
 	}
 };
 chrome.runtime.onMessage.addListener(function (request, sender, callback) {
+	console.log('background.js----- chrome.runtime.onMessage.addListener');
 	if (request && sender) {
 		if (request.cmd && sender.tab) {
 			if (cmdFromTab.hasOwnProperty(request.cmd)) {
@@ -274,6 +275,7 @@ function CheckURL() {
 	});
 }
 function ToggleContextMenu(tgl) {
+	console.log(tgl);
 	chrome.contextMenus.update('start', {
 		'enabled': tgl
 	});
@@ -286,10 +288,12 @@ function ToggleContextMenu(tgl) {
 }
 
 chrome.tabs.onRemoved.addListener(function (tabId, info) {
+	console.log('background.js----- chrome.tabs.onRemoved.addListener');
 	newTabs.remove(newTabs.find(tabId));
 	newTabs.removeUpdateTab(tabId);
 });
 chrome.tabs.onUpdated.addListener(function (id, info, tab) {
+	console.log('background.js----- chrome.tabs.onUpdated.addListener');
 	if (info.hasOwnProperty('url')) { CheckURL(); }
 	let index = newTabs.updateTab.indexOf(tab.id);
 	if (tab.status == 'complete' && index > -1) {
@@ -298,10 +302,12 @@ chrome.tabs.onUpdated.addListener(function (id, info, tab) {
 	}
 });
 chrome.tabs.onActivated.addListener(function (info) {
+	console.log('background.js----- chrome.tabs.onActivated.addListener')
 	CheckURL();
 });
 
 chrome.windows.onFocusChanged.addListener(function (winId) {
+	console.log('background.js----- chrome.windows.onFocusChanged.addListener')
 	chrome.windows.getCurrent(function (curWin) {
 		if (curWin.id == winId) {
 			if (newTabs.findNewWin(winId) != -1) {
@@ -314,6 +320,7 @@ chrome.windows.onFocusChanged.addListener(function (winId) {
 });
 
 chrome.runtime.onStartup.addListener(function () {
+	console.log('background.js----- chrome.runtime.onStartup.addListener');
 	Storage.getSetting(function (itemsObj) {
 		if (itemsObj && itemsObj.hasOwnProperty('settings')) {
 			Panel.setSettings(itemsObj.settings);
@@ -322,6 +329,7 @@ chrome.runtime.onStartup.addListener(function () {
 });
 
 chrome.contextMenus.onClicked.addListener(function (info, tab) {
+	console.log('background.js----- chrome.contextMenus.onClicked.addListener')
 	switch (info.menuItemId) {
 		case 'start':
 			SendMessage(tab.id, { cmd: 'start' });

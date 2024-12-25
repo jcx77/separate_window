@@ -3,6 +3,9 @@
  */
 var i18 = chrome.i18n.getMessage;
 var Tabs = chrome.tabs;
+import { Storage } from './storage.js';
+import { cmdFromTab } from './background.js';
+import { Panel } from './bg_panel.js';
 var PopUp = {
     _forEmptyTab: function () {
         chrome.tabs.query({active: true, currentWindow: true}, function (tab) {
@@ -26,8 +29,36 @@ var PopUp = {
 
     _loadSettings: function () {
         this._forEmptyTab();
+        let cfg = Panel.cfg;
+        document.getElementById('duplicate').checked = cfg.isDuplicate;
+        document.getElementById('isCopy').checked = cfg.isCopy;
+        document.getElementById('focus').checked = !cfg.isFocus; // !cfg.isFocus as per your original logic
+        document.getElementById('hideAllIcon').checked = cfg.hideAllIcon;
+        document.getElementById('advSettings').checked = cfg.showAdvSettings;
 
-        chrome.runtime.sendMessage({cmd: 'getPanelConfig'}, function (response) {
+        let pos = cfg.position;
+        let size = cfg.size;
+        document.getElementById('width').value = size.width || 'Auto';
+        document.getElementById('height').value = size.height || 'Auto';
+
+        // Position handling
+        if (pos.auto) {
+            document.getElementById('auto').checked = true;
+        } else {
+            if (pos.left) {
+                pos.top ? document.getElementById('lftop').checked = true :
+                    document.getElementById('lfbottom').checked = true;
+            } else {
+                pos.top ? document.getElementById('rgtop').checked = true :
+                    document.getElementById('rgbottom').checked = true;
+            }
+        }
+        PopUp.toggleAdvSettings();
+        PopUp.toggleDupCfg();
+
+
+
+        /*chrome.runtime.sendMessage({cmd: 'getPanelConfig'}, function (response) {
            // console.log('tab.id', tab.id);
             console.log('获取到的设置信息为：', response);
             if (!response.panel) {
@@ -62,7 +93,7 @@ var PopUp = {
             console.log(this);
             PopUp.toggleAdvSettings();
             PopUp.toggleDupCfg();
-        });
+        });*/
 
 
     },
@@ -128,16 +159,18 @@ var PopUp = {
         this.getTab(function (tab) {
             let last = document.getElementById('last'),
                 history = document.getElementById('history');
-            console.log(tab.url);
-            chrome.storage.local.get(tab.url, function (itemObj) {
+
+
+            Storage.getItems(tab.url, function (itemObj) {
                 if (itemObj) {
-                    let items = itemObj[tab.url];
-                    console.log(items);
+                    let items = itemObj;
                     history.style.display = 'block';
                     last.innerHTML = '';
                     for (let i = 0, len = items.css.length; i < len; ++i) {
-                        let name = items.name[i] || 'Area #' + (i + 1);
-                        let checked = items.icon[i] ? 'checked' : '';
+                        let name = items.name[i];
+                        let checked = '';
+                        if (items.icon[i] == true) checked = 'checked';
+                        if (name == '') name = 'Area #' + (i + 1);
                         last.innerHTML += '<div id="' + i + '" class="buttons" data-index="' + i + '">' +
                             '<div class="name" data-index="' + i + '">' + name + '</div>' +
                             '<div class="edit">' +
@@ -146,16 +179,17 @@ var PopUp = {
                             '</div>' +
                             '</div>';
                     }
-
-                    document.querySelectorAll('.buttons').forEach(function (button) {
-                        button.addEventListener('mouseenter', this.switchOn.bind(PopUp));
-                        button.addEventListener('mouseleave', this.switchOff.bind(PopUp));
-                    }, PopUp);
+                    document.querySelectorAll('.buttons').forEach(
+                        function (button) {
+                            button.addEventListener('mouseenter', this.switchOn.bind(PopUp));
+                            button.addEventListener('mouseleave', this.switchOff.bind(PopUp));
+                        }, PopUp);
                 } else {
                     history.style.display = 'none';
                     last.innerHTML = '';
                 }
             });
+
         });
     },
 
@@ -163,11 +197,7 @@ var PopUp = {
         let index = target.getAttribute('data-index');
         let prop = {name: 'icon', value: target.checked};
         this.getTab(function (tab) {
-            console.log("this.getTab tab.id"+tab.id);
-            chrome.storage.local.get(tab.url, function (itemsObj) {
-                itemsObj[tab.url].icon[index] = target.checked;
-                chrome.storage.local.set({[tab.url]: itemsObj[tab.url]});
-            });
+            Storage.saveProp(tab.url, index, prop);
             Tabs.sendMessage(tab.id, {cmd: 'refreshIcon', arg: {}}, function (response) {
             });
         });
@@ -176,23 +206,16 @@ var PopUp = {
     onButtons: function (target) {
         let index = target.getAttribute('data-index');
         this.getTab(function (tab) {
-            chrome.runtime.sendMessage({cmd: 'fromHistory', index: index, tabId: tab.id});
+            cmdFromTab.fromHistory(index, tab);
         });
     },
 
     onDelete: function (target) {
         let index = target.getAttribute('data-index');
         this.getTab(function (tab) {
-            chrome.storage.local.get(tab.url, function (itemsObj) {
-                itemsObj[tab.url].css.splice(index, 1);
-                itemsObj[tab.url].name.splice(index, 1);
-                itemsObj[tab.url].icon.splice(index, 1);
-                itemsObj[tab.url].size.splice(index, 1);
-                chrome.storage.local.set({[tab.url]: itemsObj[tab.url]}, function () {
-                    PopUp._formHistory();
-                    Tabs.sendMessage(tab.id, {cmd: 'refreshIcon', arg: {}}, function (response) {
-                    });
-                });
+            Storage.delItem(tab.url, index, function () {
+                PopUp._formHistory();
+                Tabs.sendMessage(tab.id, { cmd: 'refreshIcon', arg: {} }, function (response) { });
             });
         });
     },
@@ -217,8 +240,8 @@ var PopUp = {
     switchOn: function (e) {
         let index = e.target.getAttribute('data-index');
         this.getTab(function (tab) {
-            chrome.storage.local.get(tab.url, function (itemsObj) {
-                Tabs.sendMessage(tab.id, {cmd: 'switchOn', arg: {css: itemsObj[tab.url].css[index]}});
+            Storage.getItem(tab.url, index, function (item) {
+                Tabs.sendMessage(tab.id, { cmd: 'switchOn', arg: { css: item.selector } });
             });
         });
     },
@@ -229,7 +252,34 @@ var PopUp = {
     },
 
     saveSettings: function () {
-        let cfg = {};
+
+        Panel.cfg.isDuplicate = document.getElementById('duplicate').checked;
+        Panel.cfg.isCopy = document.getElementById('isCopy').checked;
+        Panel.cfg.isFocus = !document.getElementById('focus').checked;
+        Panel.cfg.hideAllIcon = document.getElementById('hideAllIcon').checked;
+        Panel.cfg.size.width = document.getElementById('width').value;
+        Panel.cfg.size.height = document.getElementById('height').value;
+        Panel.cfg.showAdvSettings = document.getElementById('advSettings').checked;
+        let pos = { left: 0, top: 0, auto: 0 };
+        if (document.getElementById('auto').checked) {
+            pos.auto = 1;
+        } else {
+            if (document.getElementById('lftop').checked || document.getElementById('rgtop').checked) {
+                pos.top = 1;
+            }
+            if (document.getElementById('lftop').checked || document.getElementById('lfbottom').checked) {
+                pos.left = 1;
+            }
+        }
+        if (Panel.cfg.hideAllIcon) {
+            this.sendCommand({ cmd: 'hideAllIcons', arg: {} },function(response){});
+        } else {
+            this.sendCommand({ cmd: 'refreshIcon', arg: {} },function(response){});
+        }
+        Panel.cfg.position = pos;
+        Panel.saveSetting();
+
+/*        let cfg = {};
         cfg.isDuplicate = document.getElementById('duplicate').checked;
         cfg.isCopy = document.getElementById('isCopy').checked;
         cfg.isFocus = !document.getElementById('focus').checked;  // Inverted logic
@@ -260,7 +310,7 @@ var PopUp = {
         } else {
             this.sendCommand({cmd: 'refreshIcon', arg: {}}, function (response) {
             });
-        }
+        }*/
     },
 
     toggleAdvSettings: function () {

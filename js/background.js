@@ -121,7 +121,7 @@ const Bookmarks = {
 };
 
 // 处理来自标签页的命令
-const cmdFromTab = {
+export const cmdFromTab = {
 	apply(arg, tab) {
 		if (newTabs.find(tab.id) == -1) {
 			newTabs.add(tab.id, arg.selector, tab.windowId);
@@ -278,6 +278,7 @@ function CheckURL() {
 }
 
 function ToggleContextMenu(tgl) {
+	console.log(tgl);
 	chrome.contextMenus.update('start', {
 		'enabled': tgl
 	});
@@ -291,11 +292,13 @@ function ToggleContextMenu(tgl) {
 
 // 监听标签页和窗口事件
 chrome.tabs.onRemoved.addListener((tabId, info) => {
+	console.log('chrome.tabs.onRemoved.addListener');
 	newTabs.remove(newTabs.find(tabId));
 	newTabs.removeUpdateTab(tabId);
 });
 
 chrome.tabs.onUpdated.addListener((id, info, tab) => {
+	console.log('chrome.tabs.onUpdated.addListener');
 	if (info.hasOwnProperty('url')) { CheckURL(); }
 	const index = newTabs.updateTab.indexOf(tab.id);
 	if (tab.status === 'complete' && index > -1) {
@@ -305,11 +308,14 @@ chrome.tabs.onUpdated.addListener((id, info, tab) => {
 });
 
 chrome.tabs.onActivated.addListener(() => {
+	console.log('chrome.tabs.onActivated.addListener');
 	CheckURL();
 });
 
 chrome.windows.onFocusChanged.addListener((winId) => {
+	console.log('chrome.windows.onFocusChanged.addListener');
 	chrome.windows.getCurrent((curWin) => {
+		console.log(curWin);
 		if (curWin.id == winId) {
 			ToggleContextMenu(newTabs.findNewWin(winId) == -1);
 		}
@@ -317,6 +323,7 @@ chrome.windows.onFocusChanged.addListener((winId) => {
 });
 
 chrome.runtime.onStartup.addListener(() => {
+	console.log('chrome.runtime.onStartup.addListener');
 	Storage.getSetting((itemsObj) => {
 		if (itemsObj && itemsObj.hasOwnProperty('settings')) {
 			Panel.setSettings(itemsObj.settings);
@@ -325,6 +332,7 @@ chrome.runtime.onStartup.addListener(() => {
 });
 
 chrome.contextMenus.onClicked.addListener(function (info, tab) {
+	console.log('chrome.contextMenus.onClicked.addListener');
 	switch (info.menuItemId) {
 		case 'start':
 			SendMessage(tab.id, { cmd: 'start' });
@@ -339,7 +347,6 @@ chrome.contextMenus.onClicked.addListener(function (info, tab) {
 			break;
 	}
 });
-
 let contextMenuId = ['start', 'entireTab', 'back'];
 let contextMenuI18 = ['txtButtonChooseOff', 'txtButtonPopTabOff', 'PanelBack'];
 let contextMenuCfg = ['page', 'frame', 'selection', 'link', 'editable', 'image', 'video', 'audio'];

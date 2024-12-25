@@ -167,8 +167,8 @@ export var Panel = {
 
 // 监听来自其他脚本的消息
 chrome.runtime.onMessage.addListener((request, sender, callback) => {
-	console.log("request"+request);
-	console.log("sender"+sender);
+	// console.log("request"+request);
+	// console.log("sender"+sender);
 	if (request && sender && request.cmd) {
 		if (request.cmd === 'getPanelConfig') {
 			// 当收到请求时返回 Panel 配置

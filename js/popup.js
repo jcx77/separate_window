@@ -27,7 +27,6 @@ var PopUp = {
 		}.bind(this));
 	},
 	_loadSettings: function () {
-		console.log(Bg.Panel);
 		this._forEmptyTab();
 		document.getElementById('duplicate').checked = Bg.Panel.cfg.isDuplicate;
 		document.getElementById('isCopy').checked = Bg.Panel.cfg.isCopy;
@@ -67,9 +66,6 @@ var PopUp = {
 		}
 	},
 	_onClick: function (e) {
-		console.log('_onClick');
-		console.log(e.target.id);
-		console.log(e.target.className);
 		switch (e.target.id) {
 			case 'select':
 				this.onSelect();
@@ -196,7 +192,6 @@ var PopUp = {
 		this.sendCommand({ cmd: 'switchOff', arg: {} },function(response){});
 	},
 	saveSettings: function () {
-		console.log('saveSettings');
 		Bg.Panel.cfg.isDuplicate = document.getElementById('duplicate').checked;
 		Bg.Panel.cfg.isCopy = document.getElementById('isCopy').checked;
 		Bg.Panel.cfg.isFocus = !document.getElementById('focus').checked;

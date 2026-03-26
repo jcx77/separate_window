@@ -6,34 +6,40 @@ var Bg = chrome.extension.getBackgroundPage();
 var Tabs = chrome.tabs;
 
 var PopUp = {
-	_forEmptyTab: function () {
-		chrome.tabs.query({ active: true, currentWindow: true }, function (tab) {
+	_forEmptyTab: function() {
+		chrome.tabs.query({
+			active: true,
+			currentWindow: true
+		}, function(tab) {
 			if (tab[0].url.indexOf('chrome://newtab/') == 0) {
 				document.querySelectorAll('.wrap-buttons').forEach(
-					function (elem) {
+					function(elem) {
 						elem.style.display = 'none';
 					});
 				document.getElementById('advCfg').style.maxHeight = '550px';
 			} else {
-				this.sendCommand({ cmd: 'isRun' }, function (response) {
+				this.sendCommand({
+					cmd: 'isRun'
+				}, function(response) {
 					if (response == 'err') {
 						document.getElementById('error').style.display = 'block';
 						document.getElementById('main').style.display = 'none';
 					} else {
 						document.getElementById('select').checked = response;
 					}
-				});	
+				});
 			}
 		}.bind(this));
 	},
-	_loadSettings: function () {
+	_loadSettings: function() {
 		this._forEmptyTab();
 		document.getElementById('duplicate').checked = Bg.Panel.cfg.isDuplicate;
 		document.getElementById('isCopy').checked = Bg.Panel.cfg.isCopy;
 		document.getElementById('focus').checked = !Bg.Panel.cfg.isFocus;
 		document.getElementById('hideAllIcon').checked = Bg.Panel.cfg.hideAllIcon;
 		document.getElementById('advSettings').checked = Bg.Panel.cfg.showAdvSettings;
-		let pos = Bg.Panel.cfg.position, size = Bg.Panel.cfg.size;
+		let pos = Bg.Panel.cfg.position,
+			size = Bg.Panel.cfg.size;
 		document.getElementById('width').value = size.width;
 		document.getElementById('height').value = size.height;
 		if (pos.auto) {
@@ -50,22 +56,20 @@ var PopUp = {
 		this.toggleAdvSettings();
 		this.toggleDupCfg();
 	},
-	_localization: function () {
+	_localization: function() {
 		let elems = document.querySelectorAll('*[data-i18n]');
 		for (let elem of elems) {
 			if (elem.classList.contains('switch-inner') || elem.classList.contains('button')) {
 				elem.setAttribute('data-on', i18(elem.getAttribute('data-i18n') + 'On'));
 				elem.setAttribute('data-off', i18(elem.getAttribute('data-i18n') + 'Off'));
-			}
-			else if (elem.classList.contains('mark')) {
+			} else if (elem.classList.contains('mark')) {
 				elem.setAttribute('title', i18(elem.getAttribute('data-i18n')));
-			}
-			else {
+			} else {
 				elem.innerHTML = i18(elem.getAttribute('data-i18n'));
 			}
 		}
 	},
-	_onClick: function (e) {
+	_onClick: function(e) {
 		switch (e.target.id) {
 			case 'select':
 				this.onSelect();
@@ -104,12 +108,12 @@ var PopUp = {
 				break;
 		}
 	},
-	_formHistory: function () {
-		this.getTab(function (tab) {
+	_formHistory: function() {
+		this.getTab(function(tab) {
 			let last = document.getElementById('last'),
 				history = document.getElementById('history');
 
-			Bg.Storage.getItems(tab.url, function (itemObj) {
+			Bg.Storage.getItems(tab.url, function(itemObj) {
 				if (itemObj) {
 					let items = itemObj;
 					history.style.display = 'block';
@@ -128,7 +132,7 @@ var PopUp = {
 							'</div>';
 					}
 					document.querySelectorAll('.buttons').forEach(
-						function (button) {
+						function(button) {
 							button.addEventListener('mouseenter', this.switchOn.bind(PopUp));
 							button.addEventListener('mouseleave', this.switchOff.bind(PopUp));
 						}, PopUp);
@@ -139,59 +143,82 @@ var PopUp = {
 			});
 		});
 	},
-	onCheckIcons: function (target) {
+	onCheckIcons: function(target) {
 		let index = target.getAttribute('data-index');
-		let prop = { name: 'icon', value: target.checked };
-		this.getTab(function (tab) {
+		let prop = {
+			name: 'icon',
+			value: target.checked
+		};
+		this.getTab(function(tab) {
 			Bg.Storage.saveProp(tab.url, index, prop);
-			Tabs.sendMessage(tab.id, { cmd: 'refreshIcon', arg: {} }, function (response) { });
+			Tabs.sendMessage(tab.id, {
+				cmd: 'refreshIcon',
+				arg: {}
+			}, function(response) {});
 		});
 	},
-	onButtons: function (target) {
+	onButtons: function(target) {
 		let index = target.getAttribute('data-index');
-		this.getTab(function (tab) {
+		this.getTab(function(tab) {
 			Bg.cmdFromTab.fromHistory(index, tab);
 		});
 	},
-	onDelete: function (target) {
+	onDelete: function(target) {
 		let index = target.getAttribute('data-index');
-		this.getTab(function (tab) {
-			Bg.Storage.delItem(tab.url, index, function () {
+		this.getTab(function(tab) {
+			Bg.Storage.delItem(tab.url, index, function() {
 				PopUp._formHistory();
-				Tabs.sendMessage(tab.id, { cmd: 'refreshIcon', arg: {} }, function (response) { });
+				Tabs.sendMessage(tab.id, {
+					cmd: 'refreshIcon',
+					arg: {}
+				}, function(response) {});
 			});
 		});
 	},
-	onPopTab: function () {
-		this.sendCommand({ cmd: 'entireTab' },
-			function (answer) {
+	onPopTab: function() {
+		this.sendCommand({
+				cmd: 'entireTab'
+			},
+			function(answer) {
 				if (answer) window.close();
 			}
 		);
 	},
-	onSelect: function () {
+	onSelect: function() {
 		if (document.getElementById('select').checked) {
-			this.sendCommand({ cmd: 'start' },
-				function (answer) {
+			this.sendCommand({
+					cmd: 'start'
+				},
+				function(answer) {
 					window.close();
 				}
 			);
 		} else {
-			this.sendCommand({ cmd: 'stop' },function(response){});
+			this.sendCommand({
+				cmd: 'stop'
+			}, function(response) {});
 		}
 	},
-	switchOn: function (e) {
+	switchOn: function(e) {
 		let index = e.target.getAttribute('data-index');
-		this.getTab(function (tab) {
-			Bg.Storage.getItem(tab.url, index, function (item) {
-				Tabs.sendMessage(tab.id, { cmd: 'switchOn', arg: { css: item.selector } });
+		this.getTab(function(tab) {
+			Bg.Storage.getItem(tab.url, index, function(item) {
+				Tabs.sendMessage(tab.id, {
+					cmd: 'switchOn',
+					arg: {
+						css: item.selector
+					}
+				});
 			});
 		});
 	},
-	switchOff: function () {
-		this.sendCommand({ cmd: 'switchOff', arg: {} },function(response){});
+	switchOff: function() {
+		this.sendCommand({
+			cmd: 'switchOff',
+			arg: {}
+		}, function(response) {});
 	},
-	saveSettings: function () {
+	saveSettings: function() {
 		Bg.Panel.cfg.isDuplicate = document.getElementById('duplicate').checked;
 		Bg.Panel.cfg.isCopy = document.getElementById('isCopy').checked;
 		Bg.Panel.cfg.isFocus = !document.getElementById('focus').checked;
@@ -199,7 +226,11 @@ var PopUp = {
 		Bg.Panel.cfg.size.width = document.getElementById('width').value;
 		Bg.Panel.cfg.size.height = document.getElementById('height').value;
 		Bg.Panel.cfg.showAdvSettings = document.getElementById('advSettings').checked;
-		let pos = { left: 0, top: 0, auto: 0 };
+		let pos = {
+			left: 0,
+			top: 0,
+			auto: 0
+		};
 		if (document.getElementById('auto').checked) {
 			pos.auto = 1;
 		} else {
@@ -211,40 +242,51 @@ var PopUp = {
 			}
 		}
 		if (Bg.Panel.cfg.hideAllIcon) {
-			this.sendCommand({ cmd: 'hideAllIcons', arg: {} },function(response){});
+			this.sendCommand({
+				cmd: 'hideAllIcons',
+				arg: {}
+			}, function(response) {});
 		} else {
-			this.sendCommand({ cmd: 'refreshIcon', arg: {} },function(response){});
+			this.sendCommand({
+				cmd: 'refreshIcon',
+				arg: {}
+			}, function(response) {});
 		}
 		Bg.Panel.cfg.position = pos;
 		Bg.Panel.saveSetting();
 	},
-	toggleAdvSettings: function () {
+	toggleAdvSettings: function() {
 		if (document.getElementById('advSettings').checked) {
 			document.getElementById('advCfg').style.maxHeight = '550px';
 		} else {
 			document.getElementById('advCfg').style.maxHeight = '0';
 		}
 	},
-	toggleDupCfg: function () {
+	toggleDupCfg: function() {
 		if (document.getElementById('duplicate').checked) {
 			document.getElementById('restTab').style.display = 'block';
 		} else {
 			document.getElementById('restTab').style.display = 'none';
 		}
 	},
-	init: function () {
+	init: function() {
 		this._loadSettings();
 		this._localization();
 		this._formHistory();
 		document.body.addEventListener('click', this._onClick.bind(PopUp));
 	},
-	getTab: function (callback) {
-		Tabs.query({ active: true, currentWindow: true }, function (tab) { callback(tab[0]); });
+	getTab: function(callback) {
+		Tabs.query({
+			active: true,
+			currentWindow: true
+		}, function(tab) {
+			callback(tab[0]);
+		});
 	},
-	sendCommand: function (command, callback) {
-		this.getTab(function (tab) {
-			Tabs.sendMessage(tab.id, command, function (response) {
-				if (typeof (response) == 'undefined') {
+	sendCommand: function(command, callback) {
+		this.getTab(function(tab) {
+			Tabs.sendMessage(tab.id, command, function(response) {
+				if (typeof(response) == 'undefined') {
 					callback('err');
 				} else {
 					callback(response);
@@ -254,4 +296,6 @@ var PopUp = {
 	}
 };
 
-window.onload = function () { PopUp.init(); };
+window.onload = function() {
+	PopUp.init();
+};

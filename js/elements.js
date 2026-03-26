@@ -6,13 +6,24 @@ var __Element = {
 	classPreview: '__previewTarget',
 	isPresent: false,
 	isPreview: false,
-	size: { top: 0, left: 0, width: 0, height: 0 },
+	size: {
+		top: 0,
+		left: 0,
+		width: 0,
+		height: 0
+	},
 	wrapper: undefined,
 	elemPreview: undefined,
-	addStyle: function () { CssControl.insert('preview'); },
-	delStyle: function () { CssControl.remove('preview'); },
-	isBigElem: function (elem) {
-		var size = [], big_width = 0, big_height = 0;
+	addStyle: function() {
+		CssControl.insert('preview');
+	},
+	delStyle: function() {
+		CssControl.remove('preview');
+	},
+	isBigElem: function(elem) {
+		var size = [],
+			big_width = 0,
+			big_height = 0;
 		if (elem) {
 			size = elem.getBoundingClientRect();
 			big_width = document.documentElement.clientWidth * 0.9;
@@ -21,13 +32,13 @@ var __Element = {
 		}
 		return false;
 	},
-	initClass: function (elem) {
+	initClass: function(elem) {
 		this.isBigElem(elem) ? this.class = '__zoomTargetBig' : this.class = '__zoomTarget';
 	},
-	initPreview: function (elem) {
+	initPreview: function(elem) {
 		this.isBigElem(elem) ? this.classPreview = '__previewTargetBig' : this.classPreview = '__previewTarget';
 	},
-	addWrapper: function () {
+	addWrapper: function() {
 		if (!this.isPresent) {
 			this.addStyle();
 			this.wrapper = document.createElement('span');
@@ -35,15 +46,17 @@ var __Element = {
 			this.isPresent = true;
 		}
 	},
-	delWrapper: function () {
+	delWrapper: function() {
 		if (this.isPresent) {
 			this.delStyle();
 			document.body.removeChild(this.wrapper);
 			this.isPresent = false;
 		}
 	},
-	showWrapper: function () { this.wrapper.style.visibility = 'visible'; },
-	switchOn: function (elem) {
+	showWrapper: function() {
+		this.wrapper.style.visibility = 'visible';
+	},
+	switchOn: function(elem) {
 		if (elem) {
 			this.elemPreview = elem;
 			this.isPreview = true;
@@ -58,7 +71,7 @@ var __Element = {
 			};
 		}
 	},
-	switchOff: function () {
+	switchOff: function() {
 		if (this.elemPreview) {
 			this.delStyle();
 			if (this.elemPreview.classList.contains(this.classPreview)) {
@@ -68,8 +81,10 @@ var __Element = {
 			this.isPreview = false;
 		}
 	},
-	hideWrapper: function () { this.wrapper.style.visibility = 'hidden'; },
-	set: function (elem) {
+	hideWrapper: function() {
+		this.wrapper.style.visibility = 'hidden';
+	},
+	set: function(elem) {
 		if (elem && elem.nodeName !== 'HTML' && elem !== document) {
 			this.reset();
 			this.prototype = elem;
@@ -82,17 +97,19 @@ var __Element = {
 			this.showWrapper();
 		}
 	},
-	reset: function () {
+	reset: function() {
 		if (this.prototype) {
 			this.prototype.classList.remove(this.class);
 			delete this.prototype;
 		}
 	},
-	getSize: function (elem) {
-		if (elem) { this.size = elem.getBoundingClientRect(); }
+	getSize: function(elem) {
+		if (elem) {
+			this.size = elem.getBoundingClientRect();
+		}
 		return this.size;
 	},
-	modifyStyle: function (elem) {
+	modifyStyle: function(elem) {
 		if (elem) {
 			this.getSize(elem);
 			this.wrapper.style.top = this.size.top + 'px';

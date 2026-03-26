@@ -12,7 +12,7 @@ var Frame = {
 	timer: undefined,
 	timerTrgt: undefined,
 
-	checkFrames: function (frames) {
+	checkFrames: function(frames) {
 		this.childFrames = [];
 		var style;
 		for (var i = frames.length; i--;) {
@@ -22,46 +22,46 @@ var Frame = {
 			}
 		}
 	},
-	disconnectObserve: function () {
+	disconnectObserve: function() {
 		if (this.observer) {
 			this.observer.disconnect();
 			this.observer = undefined;
 		}
 	},
-	disconnectObserveTrgt: function () {
+	disconnectObserveTrgt: function() {
 		if (this.obsTrgt) {
 			this.obsTrgt.disconnect();
 			this.obsTrgt = undefined;
 		}
 	},
-	observeDom: function () {
+	observeDom: function() {
 		if (!this.observer) {
 			this.observer = new MutationObserver(this.onChangeDOM.bind(this));
-			this.observer.observe(document.body,
-				{
-					attributes: false,
-					characterData: false,
-					childList: true,
-					subtree: true
-				});
+			this.observer.observe(document.body, {
+				attributes: false,
+				characterData: false,
+				childList: true,
+				subtree: true
+			});
 		}
 	},
-	observeTrgt: function () {
+	observeTrgt: function() {
 		if (!this.obsTrgt && this.isVideo) {
 			this.obsTrgt = new MutationObserver(this.onChangeTrgt.bind(this));
-			this.obsTrgt.observe(document.body,
-				{
-					attributes: false,
-					characterData: false,
-					childList: true,
-					subtree: true
-				});
+			this.obsTrgt.observe(document.body, {
+				attributes: false,
+				characterData: false,
+				childList: true,
+				subtree: true
+			});
 		}
 	},
-	onChangeTrgt: function () {
-		if (this.timerTrgt) { clearTimeout(this.timerTrgt); }
+	onChangeTrgt: function() {
+		if (this.timerTrgt) {
+			clearTimeout(this.timerTrgt);
+		}
 		this.timerTrgt = setTimeout(
-			function () {
+			function() {
 				if (document.querySelector('VIDEO,OBJECT') !== this.target) {
 					this.disconnectObserveTrgt();
 					if (ModificationFrame.isSeparate) {
@@ -74,11 +74,13 @@ var Frame = {
 			}.bind(this),
 			350);
 	},
-	onChangeDOM: function () {
+	onChangeDOM: function() {
 		if (!this.target) {
-			if (this.timer) { clearTimeout(this.timer); }
+			if (this.timer) {
+				clearTimeout(this.timer);
+			}
 			this.timer = setTimeout(
-				function () {
+				function() {
 					Frame.search();
 					Frame.isVideo = Frame.isFrame = false;
 				},
@@ -87,21 +89,26 @@ var Frame = {
 			this.disconnectObserve();
 		}
 	},
-	processingFrame: function (iframes) {
+	processingFrame: function(iframes) {
 		this.isFrame = true;
 		this.checkFrames(iframes);
 		SendCmd.toChild('searchVideo');
 
 	},
-	processingVideo: function (element) {
+	processingVideo: function(element) {
 		if (element.tagName == 'VIDEO' && element.currentSrc == '') return 0;
 		this.isVideo = true;
 		this.target = element;
 		this.observeTrgt();
 		SendCmd.toParent('isVideo');
-		chrome.runtime.sendMessage({ cmd: 'loadPlayer', arg: { href: this.href } });
+		chrome.runtime.sendMessage({
+			cmd: 'loadPlayer',
+			arg: {
+				href: this.href
+			}
+		});
 	},
-	reset: function () {
+	reset: function() {
 		this.target = undefined;
 		this.childFrames = [];
 		this.disconnectObserve();
@@ -109,7 +116,7 @@ var Frame = {
 		this.isFrame = this.isVideo = false;
 		SendCmd.toParent('clear');
 	},
-	search: function () {
+	search: function() {
 		if (this.isVideo || this.isFrame) return false;
 		var element = document.querySelector('VIDEO,OBJECT');
 		if (element) {
@@ -122,8 +129,8 @@ var Frame = {
 		}
 		this.observeDom();
 	},
-	setTarget: function (source) {
-		this.childFrames.map(function (frame) {
+	setTarget: function(source) {
+		this.childFrames.map(function(frame) {
 			if (frame.contentWindow == source) {
 				this.target = frame;
 			}
@@ -132,7 +139,7 @@ var Frame = {
 };
 
 var CmdIcoming = {
-	listener: function (event) {
+	listener: function(event) {
 		if (event) {
 			if (event.data.hasOwnProperty('cmd')) {
 				event.stopImmediatePropagation();
@@ -140,17 +147,19 @@ var CmdIcoming = {
 			}
 		}
 	},
-	cmd: function (source, cmd, arg) {
+	cmd: function(source, cmd, arg) {
 		if (this.hasOwnProperty(cmd)) {
 			this[cmd](source, arg);
 		}
 	},
-	clear: function () {
+	clear: function() {
 		SendCmd.toParent('clear');
 	},
-	remove: function () {
+	remove: function() {
 		if (!Frame) return;
-		if (Frame.isFrame) { SendCmd.toTarget('remove'); }
+		if (Frame.isFrame) {
+			SendCmd.toTarget('remove');
+		}
 		Frame.disconnectObserve();
 		Frame.disconnectObserveTrgt();
 		if (ModificationFrame.isSeparate) ModificationFrame.cancel();
@@ -162,16 +171,16 @@ var CmdIcoming = {
 		CmdIncoming = undefined;
 		VideoControls = undefined;
 	},
-	searchVideo: function () {
+	searchVideo: function() {
 		Frame.search();
 	},
-	isVideo: function (source) {
+	isVideo: function(source) {
 		if (!Frame.target) {
 			SendCmd.toParent('isVideo');
 			Frame.setTarget(source);
 		}
 	},
-	cancel: function () {
+	cancel: function() {
 		if (Frame.target) {
 			if (Frame.isFrame) {
 				SendCmd.toTarget('cancel');
@@ -182,7 +191,7 @@ var CmdIcoming = {
 			}
 		}
 	},
-	modify: function () {
+	modify: function() {
 		if (Frame.target) {
 			if (Frame.isFrame) {
 				SendCmd.toTarget('modify');
@@ -193,40 +202,49 @@ var CmdIcoming = {
 			}
 		}
 	},
-	toggleFullScr: function () {
+	toggleFullScr: function() {
 		SendCmd.toParent('toggleFullScr');
 	},
-	toogleFullScrIco: function (source, arg) {
+	toogleFullScrIco: function(source, arg) {
 		if (Frame.target) {
 			if (Frame.isFrame) {
-				SendCmd.toTarget('toogleFullScrIco', { state: arg.state });
+				SendCmd.toTarget('toogleFullScrIco', {
+					state: arg.state
+				});
 			}
 			if (Frame.isVideo) {
 				VideoControls.toogleFullScrIco(arg.state);
 			}
 		}
 	},
-	minimizeWin:function(){
+	minimizeWin: function() {
 		SendCmd.toParent('minimizeWin');
 	},
-	restoreWin:function(){
+	restoreWin: function() {
 		SendCmd.toParent('restoreWin');
 	}
 };
 
 var SendCmd = {
-	toParent: function (command) {
-		parent.postMessage({ cmd: command }, '*');
+	toParent: function(command) {
+		parent.postMessage({
+			cmd: command
+		}, '*');
 	},
-	toChild: function (command, arg) {
+	toChild: function(command, arg) {
 		if (Frame.isFrame) {
-			Frame.childFrames.map(function (frame) {
-				frame.contentWindow.postMessage({ cmd: command, arg: arg }, '*');
+			Frame.childFrames.map(function(frame) {
+				frame.contentWindow.postMessage({
+					cmd: command,
+					arg: arg
+				}, '*');
 			}, this);
 		}
 	},
-	toTarget: function (command) {
-		Frame.target.contentWindow.postMessage({ cmd: command }, '*');
+	toTarget: function(command) {
+		Frame.target.contentWindow.postMessage({
+			cmd: command
+		}, '*');
 	}
 };
 
@@ -240,13 +258,13 @@ var CssControl = {
 		video: 'css/video.css'
 	},
 	frame: '',
-	setComClass: function (target) {
+	setComClass: function(target) {
 		target.classList.add(this.class.com);
 	},
-	isComClass: function (target) {
+	isComClass: function(target) {
 		return target.classList.contains(this.class.com);
 	},
-	insert: function (name) {
+	insert: function(name) {
 		if (!this.name.hasOwnProperty(name) || this.css.hasOwnProperty(name)) return 0;
 		this.css[name] = document.createElement('link');
 		this.css[name].rel = 'stylesheet';
@@ -254,7 +272,7 @@ var CssControl = {
 		this.css[name].href = chrome.extension.getURL(this.name[name]);
 		document.head.appendChild(this.css[name]);
 	},
-	remove: function (name) {
+	remove: function(name) {
 		if (this.css.hasOwnProperty(name)) {
 			document.head.removeChild(this.css[name]);
 			this.css[name] = undefined;
@@ -266,7 +284,7 @@ var CssControl = {
 var ModificationFrame = {
 	isSeparate: false,
 	target: undefined,
-	_modifyStyle: function (elem, style, isSet) {
+	_modifyStyle: function(elem, style, isSet) {
 		if (CssControl.isComClass(elem)) return 0;
 		if (isSet) {
 			elem.classList.add(style);
@@ -274,7 +292,7 @@ var ModificationFrame = {
 			elem.classList.remove(style);
 		}
 	},
-	_hideTextNode: function (elem, hide) {
+	_hideTextNode: function(elem, hide) {
 		if (hide) {
 			elem['oldValue'] = elem.nodeValue;
 			elem.nodeValue = '';
@@ -283,7 +301,7 @@ var ModificationFrame = {
 			delete elem['oldValue'];
 		}
 	},
-	_modifyOne: function (elem, isSet) {
+	_modifyOne: function(elem, isSet) {
 		let child = elem.parentNode.firstChild;
 		while (child) {
 			if (child !== elem && child.tagName !== 'SCRIPT' && child.tagName !== 'LINK') {
@@ -300,7 +318,7 @@ var ModificationFrame = {
 		}
 		this._modifyStyle(elem.parentNode, '__parent', isSet);
 	},
-	_modifyTarget: function (target, isSet) {
+	_modifyTarget: function(target, isSet) {
 		if (target.tagName == 'VIDEO') {
 			isSet ?
 				VideoControls.init(target) :
@@ -308,13 +326,13 @@ var ModificationFrame = {
 		}
 		this._modifyStyle(target, '__target', isSet);
 	},
-	_modifyParents: function (elem, isSet) {
+	_modifyParents: function(elem, isSet) {
 		if (elem && elem.tagName !== 'BODY') {
 			this._modifyOne(elem, isSet);
 			this._modifyParents(elem.parentNode, isSet);
 		}
 	},
-	do: function (target) {
+	do: function(target) {
 		CssControl.insert('iframe');
 		this.isSeparate = true;
 		this.scrollBefore = {
@@ -332,7 +350,7 @@ var ModificationFrame = {
 			}
 		}
 	},
-	cancel: function () {
+	cancel: function() {
 		if (this.target) {
 			try {
 				this._modifyParents(this.target, false);
@@ -348,7 +366,7 @@ var ModificationFrame = {
 		this.isSeparate = false;
 		CssControl.remove('iframe');
 	},
-	errorRestore: function () {
+	errorRestore: function() {
 		var all = document.querySelectorAll('.__hidden,.__parent');
 		this._modifyTarget(this.target, false);
 		for (var i = all.length - 1; i >= 0; --i) {

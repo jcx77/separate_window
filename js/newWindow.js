@@ -12,7 +12,7 @@ var EventPanel = {
 	btn_player: undefined,
 	isModify: false,
 	frcePlayer: false,
-	add: function () {
+	add: function() {
 		if (!this.panel) {
 			this.panel = document.createElement('div');
 			this.panel.id = this.id.panel;
@@ -20,13 +20,13 @@ var EventPanel = {
 			document.body.appendChild(this.panel);
 		}
 	},
-	remove: function () {
+	remove: function() {
 		if (this.panel) {
 			this.removeBtnPlayer();
 			this.removeBtnResize();
 		}
 	},
-	insertBtnResize: function () {
+	insertBtnResize: function() {
 		this.add();
 		if (!this.btn_resize) {
 			this.btn_resize = document.createElement('button');
@@ -38,7 +38,7 @@ var EventPanel = {
 			this.panel.classList.add('__evt_panel_blink');
 		}
 	},
-	insertBtnPlayer: function () {
+	insertBtnPlayer: function() {
 		this.add();
 		if (!this.btn_player) {
 			this.btn_player = document.createElement('button');
@@ -50,7 +50,7 @@ var EventPanel = {
 			this.panel.classList.add('__evt_panel_blink');
 		}
 	},
-	removeBtnPlayer: function () {
+	removeBtnPlayer: function() {
 		if (this.btn_player) {
 			this.panel.removeChild(this.btn_player);
 			this.btn_player = undefined;
@@ -58,7 +58,7 @@ var EventPanel = {
 			this.removePanel();
 		}
 	},
-	removeBtnResize: function () {
+	removeBtnResize: function() {
 		if (this.btn_resize) {
 			this.panel.removeChild(this.btn_resize);
 			this.btn_resize = undefined;
@@ -66,13 +66,13 @@ var EventPanel = {
 			this.removePanel();
 		}
 	},
-	removePanel: function () {
+	removePanel: function() {
 		if (!this.btn_player && !this.btn_resize) {
 			document.body.removeChild(this.panel);
 			this.panel = undefined;
 		}
 	},
-	switchBtnResize: function (isModify) {
+	switchBtnResize: function(isModify) {
 		this.isModify = isModify;
 		if (isModify) {
 			this.btn_resize.classList.remove('__btn_resize_off');
@@ -82,7 +82,7 @@ var EventPanel = {
 			this.btn_resize.classList.add('__btn_resize_off');
 		}
 	},
-	clickBtnPlayer: function () {
+	clickBtnPlayer: function() {
 		if (this.frcePlayer) {
 			VideoControls.remove();
 			this.btn_player.title = chrome.i18n.getMessage('PanelForcePlayerOn');
@@ -96,7 +96,7 @@ var EventPanel = {
 		}
 		this.frcePlayer = !this.frcePlayer;
 	},
-	clickBtnResize: function () {
+	clickBtnResize: function() {
 		if (this.isModify) {
 			CmdToFrame.cancel();
 		} else {
@@ -110,7 +110,7 @@ var ButtonPanel = {
 	id: {
 		panel: '__btn_panel',
 		btn_back: '__btn_back',
-		btn_save:'__btn_save',
+		btn_save: '__btn_save',
 		btn_up: '__btn_up',
 		btn_dwn: '__btn_dwn',
 		btn_prsc: '__btn_prsc',
@@ -121,7 +121,7 @@ var ButtonPanel = {
 		win_link: '__win_link',
 		win_link_over: '__win_link_overlay'
 	},
-	btn_save:{},
+	btn_save: {},
 	btn_dwn: {},
 	btn_up: {},
 	btn_prsc: {},
@@ -131,7 +131,7 @@ var ButtonPanel = {
 	win_link: {},
 	isShowLink: false,
 	windowZoom: 0,
-	add: function () {
+	add: function() {
 		CssControl.insert('panel');
 		this.panel = document.createElement('div');
 		this.panel.innerHTML = '<button id="' + this.id.btn_back + '" class="' + CssControl.class.btnPanel + '" title="' + chrome.i18n.getMessage('PanelBack') + '"></button>' +
@@ -156,17 +156,21 @@ var ButtonPanel = {
 			this.btn_dwn.style.display = 'none';
 			this.btn_save.style.display = 'none';
 		}
-		__BgCmd.sendCmd('checkSaveSize', { selector: Modification.selector });
+		__BgCmd.sendCmd('checkSaveSize', {
+			selector: Modification.selector
+		});
 		Bookmarks.checkBookmark(Modification.target);
 		this.scrollDownEnabled(false);
-		setTimeout(function () {
+		setTimeout(function() {
 			ButtonPanel.changeZoom();
 		}, 650);
 	},
-	remove: function () {
+	remove: function() {
 		CssControl.remove('panel');
 		if (this.panel instanceof HTMLElement) document.body.removeChild(this.panel);
-		if (this.isShowLink) { this.delWinLink(); }
+		if (this.isShowLink) {
+			this.delWinLink();
+		}
 		this.btn_save = {};
 		this.btn_up = {};
 		this.btn_dwn = {};
@@ -176,53 +180,55 @@ var ButtonPanel = {
 		this.btn_link = {};
 		this.win_link = {};
 	},
-	clickBack: function () {
+	clickBack: function() {
 		__AppPanel.cancel();
 	},
-	clickSave:function(){
-		let size={};
-		if(!Modification.isSavedSize){
-			size={
-				top : window.screenTop,
-				left : window.screenLeft,
-				width : window.outerWidth,//innerWidth,
-				height : window.outerHeight//innerHeight
+	clickSave: function() {
+		let size = {};
+		if (!Modification.isSavedSize) {
+			size = {
+				top: window.screenTop,
+				left: window.screenLeft,
+				width: window.outerWidth, //innerWidth,
+				height: window.outerHeight //innerHeight
 			}
 		}
-		Modification.isSavedSize=!Modification.isSavedSize;
+		Modification.isSavedSize = !Modification.isSavedSize;
 		__AppPanel.saveSize(JSON.stringify(size));
 		this.setSavedIcon(Modification.isSavedSize);
 	},
-	clickUp: function () {
+	clickUp: function() {
 		Modification.scrollUp();
 		Bookmarks.checkBookmark(Modification.target);
 	},
-	clickDown: function () {
+	clickDown: function() {
 		Modification.scrollDown();
 		Bookmarks.checkBookmark(Modification.target);
 	},
-	clickPrtScr: function () {
+	clickPrtScr: function() {
 		this.panel.style.display = 'none';
 		VideoControls.hide();
-		setTimeout(function () {
-			__BgCmd.sendCmd('printScr', { name: window.location.hostname });
+		setTimeout(function() {
+			__BgCmd.sendCmd('printScr', {
+				name: window.location.hostname
+			});
 		}.bind(this), 50);
-		setTimeout(function () {
+		setTimeout(function() {
 			this.panel.style.display = '';
 			VideoControls.show();
 		}.bind(this), 150);
 	},
-	clickBkm: function () {
+	clickBkm: function() {
 		Bookmarks.addBookmark(Modification.target);
 	},
-	clickShowLink: function () {
+	clickShowLink: function() {
 		if (this.isShowLink) {
 			this.delWinLink();
 		} else {
 			this.showWinLink();
 		}
 	},
-	changeZoom: function () {
+	changeZoom: function() {
 		let zoom = window.devicePixelRatio;
 		let right = Modification.target.offsetWidth - Modification.target.clientWidth;
 		this.windowZoom = zoom;
@@ -235,14 +241,14 @@ var ButtonPanel = {
 		}
 		this.panel.style.right = right + 'px';
 	},
-	onResize: function () {
+	onResize: function() {
 		this.changeZoom();
 	},
-	delWinLink: function () {
+	delWinLink: function() {
 		document.body.removeChild(this.win_link);
 		this.isShowLink = false;
 	},
-	showWinLink: function () {
+	showWinLink: function() {
 		this.win_link = document.createElement('div');
 		this.win_link.innerHTML = '<div id="' + this.id.win_link + '"><div><textarea>' + Selector.getLink(Modification.target) + '</textarea></div><button id="' + this.id.btn_win_link + '" class="' + CssControl.class.btnPanel + '" ">OK</button></div>';
 		this.win_link.id = this.id.win_link_over;
@@ -250,17 +256,17 @@ var ButtonPanel = {
 		document.body.appendChild(this.win_link);
 		this.isShowLink = true;
 	},
-	scrollUpEnabled: function (enabled) {
+	scrollUpEnabled: function(enabled) {
 		enabled ?
 			this.btn_up.classList.remove('disable') :
 			this.btn_up.classList.add('disable');
 	},
-	scrollDownEnabled: function (enabled) {
+	scrollDownEnabled: function(enabled) {
 		enabled ?
 			this.btn_dwn.classList.remove('disable') :
 			this.btn_dwn.classList.add('disable');
 	},
-	setBookmark: function (isBkm) {
+	setBookmark: function(isBkm) {
 		if (isBkm) {
 			this.btn_bkm.classList.remove('btn_bkm_off');
 			this.btn_bkm.classList.add('btn_bkm_on');
@@ -269,23 +275,23 @@ var ButtonPanel = {
 			this.btn_bkm.classList.add('btn_bkm_off');
 		}
 	},
-	setSavedIcon:function(isSaved) {
-		if(isSaved){
+	setSavedIcon: function(isSaved) {
+		if (isSaved) {
 			this.btn_save.classList.remove('btn_save_off');
 			this.btn_save.classList.add('btn_save_on');
-			this.btn_save.setAttribute('title',chrome.i18n.getMessage('PanelSaveSizeOn'));
-		}else{
+			this.btn_save.setAttribute('title', chrome.i18n.getMessage('PanelSaveSizeOn'));
+		} else {
 			this.btn_save.classList.remove('btn_save_on');
 			this.btn_save.classList.add('btn_save_off');
-			this.btn_save.setAttribute('title',chrome.i18n.getMessage('PanelSaveSizeOff'));
+			this.btn_save.setAttribute('title', chrome.i18n.getMessage('PanelSaveSizeOff'));
 		}
 	}
 };
 
 var Modification = {
 	flags: {
-		initElem:undefined,
-		scroll:0
+		initElem: undefined,
+		scroll: 0
 	},
 	isSeparate: false,
 	isSavedSize: false,
@@ -298,7 +304,7 @@ var Modification = {
 	target: undefined,
 	trgtVideo: undefined,
 	fixFunc: {},
-	_modifyFunc: function () {
+	_modifyFunc: function() {
 		var func = 'Element.prototype["swRemCh"]=Element.prototype.removeChild;' +
 			'Element.prototype.removeChild=function(elem){' +
 			'if(elem.classList && (elem.classList.contains("__parent") || elem.classList.contains("__target"))){' +
@@ -311,7 +317,7 @@ var Modification = {
 		this.fixFunc.appendChild(document.createTextNode(func));
 		document.body.appendChild(this.fixFunc);
 	},
-	_removeFunc: function () {
+	_removeFunc: function() {
 		var func = 'Element.prototype.removeChild=Element.prototype.swRemCh;' +
 			'if(document.hasOwnProperty("swRemoval")){' +
 			'for(var i=0,len=document.swRemoval.length;i<len;i++){document.swRemoval[i].parentNode.removeChild(document.swRemoval[i]);};' +
@@ -321,12 +327,12 @@ var Modification = {
 		this.fixFunc.appendChild(document.createTextNode(func));
 		document.body.appendChild(this.fixFunc);
 	},
-	_deleteFunc: function () {
+	_deleteFunc: function() {
 		if (this.fixFunc.parentNode) {
 			document.body.removeChild(this.fixFunc);
 		}
 	},
-	_modifyStyle: function (elem, style, isSet) {
+	_modifyStyle: function(elem, style, isSet) {
 		if (CssControl.isComClass(elem)) return 0;
 		if (isSet) {
 			elem.classList.add(style);
@@ -336,7 +342,7 @@ var Modification = {
 			elem.classList.remove(style);
 		}
 	},
-	_hideTextNode: function (elem, hide) {
+	_hideTextNode: function(elem, hide) {
 		if (hide) {
 			elem['oldValue'] = elem.nodeValue;
 			elem.nodeValue = '';
@@ -345,7 +351,7 @@ var Modification = {
 			delete elem['oldValue'];
 		}
 	},
-	_modifyOne: function (elem, isSet) {
+	_modifyOne: function(elem, isSet) {
 		let child = elem.parentNode.firstChild;
 		while (child) {
 			if (child !== elem && child.tagName !== 'SCRIPT' && child.tagName !== 'LINK') {
@@ -362,7 +368,7 @@ var Modification = {
 		}
 		this._modifyStyle(elem.parentNode, '__parent', isSet);
 	},
-	_modifyTarget: function (target, isSet) {
+	_modifyTarget: function(target, isSet) {
 		if (isSet) {
 			VideoControls.init(target);
 			this._searchVideo(target);
@@ -372,13 +378,13 @@ var Modification = {
 		}
 		this._modifyStyle(target, '__target', isSet);
 	},
-	_modifyParents: function (elem, isSet) {
+	_modifyParents: function(elem, isSet) {
 		if (elem && elem.tagName !== 'BODY') {
 			this._modifyParents(elem.parentNode, isSet);
 			this._modifyOne(elem, isSet);
 		}
 	},
-	_scroll: function (isSet) {
+	_scroll: function(isSet) {
 		if (isSet) {
 			this.scrollBefore.top = window.pageYOffset;
 			this.scrollBefore.left = window.pageXOffset;
@@ -387,7 +393,7 @@ var Modification = {
 			this.target.classList.remove('__onScroll');
 		}
 	},
-	_searchVideo: function (target) {
+	_searchVideo: function(target) {
 		if (VideoControls.isPresent) return;
 		if (!target) target = this.target;
 		var video = target.querySelector('VIDEO');
@@ -396,14 +402,14 @@ var Modification = {
 			EventPanel.insertBtnPlayer();
 		}
 	},
-	checkTrgtScrolling: function () {
+	checkTrgtScrolling: function() {
 		if ((this.target.scrollHeight - this.target.clientHeight) > 55) {
 			this.target.classList.add('__onScroll');
 		} else {
 			this.target.classList.remove('__onScroll');
 		}
 	},
-	do: function (target, selector) {
+	do: function(target, selector) {
 		this.isSeparate = true;
 		this.target = target;
 		this.selector = selector;
@@ -422,7 +428,7 @@ var Modification = {
 			this._deleteFunc();
 		}
 	},
-	cancel: function () {
+	cancel: function() {
 		if (this.target && this.target !== document.body) {
 			this._scroll(false);
 			this._removeFunc();
@@ -444,7 +450,7 @@ var Modification = {
 		CssControl.remove('window');
 		this._deleteFunc();
 	},
-	cancelOnChangeDOM: function () {
+	cancelOnChangeDOM: function() {
 		Observer.clearServers();
 		this.errorRestore();
 		this._scroll(false);
@@ -453,11 +459,11 @@ var Modification = {
 		this.isSeparate = false;
 		document.body.removeChild(this.fixFunc);
 	},
-	checkChanges: function () {
+	checkChanges: function() {
 		if (!this.target.parentNode) {
 			let elems = document.querySelectorAll(this.selector);
 			this._modifyTarget(this.target, false);
-			elems.forEach(function (elem) {
+			elems.forEach(function(elem) {
 				if (elem.parentNode == this.parent) {
 					this.target = elem;
 					return false;
@@ -475,15 +481,15 @@ var Modification = {
 			parent = parent.parentNode;
 		}
 	},
-	isTarget: function (srcWin) {
+	isTarget: function(srcWin) {
 		return srcWin == this.target.contentWindow;
 	},
-	errorRestore: function () {
+	errorRestore: function() {
 		this._modifyTarget(this.target, false);
 		document.querySelectorAll('.__hidden,.__parent')
 			.forEach(elem => elem.classList.remove('__hidden', '__parent'));
 	},
-	scrollCheck: function () {
+	scrollCheck: function() {
 		if (this.target.tagName == 'BODY') {
 			ButtonPanel.scrollUpEnabled(false);
 		} else {
@@ -495,7 +501,7 @@ var Modification = {
 			ButtonPanel.scrollDownEnabled(true);
 		}
 	},
-	scrollUp: function () {
+	scrollUp: function() {
 		if (this.target.tagName == 'BODY') return false;
 		if (this.flags.scroll == 0) this.flags.initElem = this.target;
 		this.flags.scroll++;
@@ -509,7 +515,7 @@ var Modification = {
 		this.saveSelector();
 		return true;
 	},
-	scrollDown: function () {
+	scrollDown: function() {
 		if (this.flags.scroll == 0) return false;
 		var i = 0;
 		var elem = this.flags.initElem;
@@ -527,7 +533,7 @@ var Modification = {
 		this.saveSelector();
 		return true;
 	},
-	saveSelector:function(){
+	saveSelector: function() {
 		this.selector = Selector.getSelector(this.target);
 		__AppPanel.saveSelector(this.selector);
 	}
@@ -537,22 +543,21 @@ var SepWinEvents = {
 	timers: {
 		onResize: null
 	},
-	addEvents: function () {
+	addEvents: function() {
 		window.addEventListener('click', SepWinEvents.onClick, true);
 		window.addEventListener('resize', SepWinEvents.onResize, true);
-		window.addEventListener('unload', SepWinEvents.unloadPage,true);
+		window.addEventListener('unload', SepWinEvents.unloadPage, true);
 	},
-	removeEvents: function () {
+	removeEvents: function() {
 		clearTimeout(this.timers.onResize);
 		window.removeEventListener('click', SepWinEvents.onClick, true);
 		window.removeEventListener('resize', SepWinEvents.onResize, true);
-		window.removeEventListener('unload', SepWinEvents.unloadPage,true);
+		window.removeEventListener('unload', SepWinEvents.unloadPage, true);
 	},
-	onClick: function (event) {
+	onClick: function(event) {
 		if (CssControl.isBtnClass(event.target)) {
 			this.cmdBtnPanel(event.target.id);
-		}
-		else if (CssControl.isEventClass(event.target)) {
+		} else if (CssControl.isEventClass(event.target)) {
 			this.cmdEventPanel(event.target.id);
 		} else {
 			if (VideoControls.isPresent) {
@@ -560,18 +565,18 @@ var SepWinEvents = {
 			}
 		}
 	},
-	onResize: function () {
+	onResize: function() {
 		if (this.timers.onResize) {
 			clearTimeout(this.timers.onResize);
 		}
 		this.timers.onResize = setTimeout(
-			function () {
+			function() {
 				Modification.checkTrgtScrolling();
 				ButtonPanel.onResize();
 			},
 			150);
 	},
-	cmdEventPanel: function (id) {
+	cmdEventPanel: function(id) {
 		switch (id) {
 			case EventPanel.id.btn_resize:
 				EventPanel.clickBtnResize();
@@ -583,7 +588,7 @@ var SepWinEvents = {
 				break;
 		}
 	},
-	cmdBtnPanel: function (id) {
+	cmdBtnPanel: function(id) {
 		switch (id) {
 			case ButtonPanel.id.btn_back:
 				ButtonPanel.clickBack();
@@ -613,7 +618,7 @@ var SepWinEvents = {
 				return;
 		}
 	},
-	unloadPage:function(){
+	unloadPage: function() {
 		if (Modification.target == document.body) {
 			__BgCmd.sendCmd('updatePage', {});
 		} else {

@@ -8,7 +8,7 @@ var __Icons = {
 	isEvtResize: false,
 	selectors: undefined,
 	timer: undefined,
-	addEventResize: function () {
+	addEventResize: function() {
 		if (this.selectors) {
 			if (!this.isEvtResize) {
 				window.addEventListener('click', __Icons.click, true);
@@ -18,10 +18,10 @@ var __Icons = {
 			}
 		}
 	},
-	click: function (event) {
+	click: function(event) {
 		let target = event.target;
 		if (target.classList.contains('__iconSepWin')) {
-			__Icons.icons.forEach(function (icon) {
+			__Icons.icons.forEach(function(icon) {
 				if (icon.isIcon(target)) {
 					icon.click(event);
 					return false;
@@ -29,33 +29,37 @@ var __Icons = {
 			});
 		}
 	},
-	delEventResize: function () {
+	delEventResize: function() {
 		this.isEvtResize = false;
 		window.removeEventListener('click', __Icons.click, true);
 		window.removeEventListener('resize', __Icons.resize);
 		window.removeEventListener('scroll', __Icons.scroll, true);
 	},
-	delAllIcon: function () {
-		this.icons.forEach(function (icon) { icon.delete(); });
+	delAllIcon: function() {
+		this.icons.forEach(function(icon) {
+			icon.delete();
+		});
 		this.icons = [];
 		this.targets = [];
 		clearTimeout(this.timer);
 		this.selectors = undefined;
 		this.delEventResize();
 	},
-	_isVisible: function (trgt) {
+	_isVisible: function(trgt) {
 		let size = trgt.getBoundingClientRect(),
 			top = size.top + window.pageYOffset,
 			left = size.left + window.pageXOffset;
 		return (top >= window.pageYOffset && top <= (window.innerHeight + window.pageYOffset) && left >= window.pageXOffset);
 	},
-	findElement: function () {
+	findElement: function() {
 		if (this.hideIcons) return;
 		if (this.selectors && !Modification.isSeparate) {
-			this.selectors.forEach(function (selector) {
+			this.selectors.forEach(function(selector) {
 				var elems = document.querySelectorAll(selector);
 				for (var i = 0, length = elems.length; i < length; i++) {
-					if (!this._isVisible(elems[i])) { continue; }
+					if (!this._isVisible(elems[i])) {
+						continue;
+					}
 					if (this.targets.indexOf(elems[i]) == -1) {
 						var icon = new Icon(elems[i]);
 						this.icons.push(icon);
@@ -66,9 +70,9 @@ var __Icons = {
 			}.bind(this));
 		}
 	},
-	iconsSetPosition: function () {
+	iconsSetPosition: function() {
 		this.icons.forEach(
-			function (icon, i) {
+			function(icon, i) {
 				icon.getPosition();
 				if (icon.checkTarget() && icon.checkVisible()) {
 					for (var j = 0, len = i - 1; j <= len; j++) {
@@ -77,29 +81,35 @@ var __Icons = {
 					icon.setPosition();
 				} else {
 					var i_trgt = this.targets.indexOf(icon.getTrgt());
-					if (i_trgt > -1) { this.targets.splice(i_trgt, 1); }
+					if (i_trgt > -1) {
+						this.targets.splice(i_trgt, 1);
+					}
 					icon.delete();
 					this.icons.splice(i, 1);
 				}
 			}.bind(this));
 	},
-	resize: function () {
-		if (this.timer) { clearTimeout(this.timer); }
+	resize: function() {
+		if (this.timer) {
+			clearTimeout(this.timer);
+		}
 		this.timer = setTimeout(
-			function () {
+			function() {
 				__Icons.iconsSetPosition();
 			}.bind(this),
 			100);
 	},
-	scroll: function () {
-		if (this.timer) { clearTimeout(this.timer); }
+	scroll: function() {
+		if (this.timer) {
+			clearTimeout(this.timer);
+		}
 		this.timer = setTimeout(
-			function () {
+			function() {
 				__Icons.findElement();
 			}.bind(this),
 			60);
 	},
-	setSelectors: function (css, hide) {
+	setSelectors: function(css, hide) {
 		this.delAllIcon();
 		this.hideIcons = hide;
 		this.selectors = css;
@@ -108,17 +118,28 @@ var __Icons = {
 	}
 };
 __Icons.resize = __Icons.resize.bind(__Icons);
+
 function Icon(target) {
-	var trgt = null, icon = null, prnt = null, cssClass = '__iconSepWin';
-	this.position = { left: 0, top: 0, vert: true };
+	var trgt = null,
+		icon = null,
+		prnt = null,
+		cssClass = '__iconSepWin';
+	this.position = {
+		left: 0,
+		top: 0,
+		vert: true
+	};
+
 	function enter() {
 		Observer.disconnectDomChange();
 		__Element.switchOn(trgt);
 	}
+
 	function leave() {
 		__Element.switchOff();
 		Observer.domChange();
 	}
+
 	function calZindex() {
 		var parent = trgt;
 		var zIndex = 0;
@@ -132,6 +153,7 @@ function Icon(target) {
 		}
 		if (zIndex > 0) icon.style.zIndex = zIndex;
 	}
+
 	function create() {
 		trgt = target;
 		icon = document.createElement('div');
@@ -141,8 +163,10 @@ function Icon(target) {
 		icon.addEventListener('mouseleave', leave.bind(this));
 		calZindex();
 	}
+
 	function move(pos) {
-		var dt = 0, dl = 0;
+		var dt = 0,
+			dl = 0;
 		if (prnt.style.position == 'fixed') {
 			var rect = document.body.getBoundingClientRect();
 			dt = 0 - Math.round(rect.top);
@@ -151,6 +175,7 @@ function Icon(target) {
 		icon.style.top = Math.round(pos.top) + dt + 'px';
 		icon.style.left = Math.round(pos.left) + dl + 'px';
 	}
+
 	function paste(parent) {
 		if (icon) {
 			parent.appendChild(icon);
@@ -158,24 +183,26 @@ function Icon(target) {
 		}
 	}
 	create();
-	this.click = function (e) {
+	this.click = function(e) {
 		e.preventDefault();
 		e.stopImmediatePropagation();
 		__Element.switchOff();
 		__AppPanel.apply(trgt);
 	};
-	this.isIcon = function (elem) {
+	this.isIcon = function(elem) {
 		return icon == elem;
 	};
-	this.delete = function () {
-		if (prnt) { prnt.removeChild(icon); }
+	this.delete = function() {
+		if (prnt) {
+			prnt.removeChild(icon);
+		}
 	};
-	this.checkPosition = function (pos) {
+	this.checkPosition = function(pos) {
 		if (Math.abs(pos.left - this.position.left) < 22 && Math.abs(pos.top - this.position.top) < 20) {
 			this.position.vert ? this.position.top = pos.top + 22 : this.position.left = pos.left + 24;
 		}
 	};
-	this.checkTarget = function () {
+	this.checkTarget = function() {
 		if ('offsetParent' in trgt) {
 			return !!trgt.offsetParent;
 		} else {
@@ -186,13 +213,19 @@ function Icon(target) {
 			}
 		}
 	};
-	this.checkVisible = function () { return (this.position.top >= window.pageYOffset && this.position.top <= (window.innerHeight + window.pageYOffset) && this.position.left >= window.pageXOffset); };
-	this.setPosition = function () {
-		if (!prnt) { paste(document.body); }
+	this.checkVisible = function() {
+		return (this.position.top >= window.pageYOffset && this.position.top <= (window.innerHeight + window.pageYOffset) && this.position.left >= window.pageXOffset);
+	};
+	this.setPosition = function() {
+		if (!prnt) {
+			paste(document.body);
+		}
 		move(this.position);
 	};
-	this.getPosition = function () {
-		var size = trgt.getBoundingClientRect(), top = size.top, left = size.left;
+	this.getPosition = function() {
+		var size = trgt.getBoundingClientRect(),
+			top = size.top,
+			left = size.left;
 		if (left < 22) {
 			top -= 20;
 			this.position.vert = false;
@@ -204,7 +237,7 @@ function Icon(target) {
 		this.position.left = left + window.pageXOffset;
 		return this.position;
 	};
-	this.getTrgt = function () {
+	this.getTrgt = function() {
 		return trgt;
 	};
 }

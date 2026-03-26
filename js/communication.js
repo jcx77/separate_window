@@ -1,156 +1,168 @@
 /**
  * Author: Belousov Alexandr
  */
-if(window == top){
+if (window == top) {
 	chrome.runtime.onMessage.addListener(
-		function(request,sender,callback){
-			if(request){callback(__BgCmd.cmd(request.cmd,request.arg));}
+		function(request, sender, callback) {
+			if (request) {
+				callback(__BgCmd.cmd(request.cmd, request.arg));
+			}
 		}
 	);
-	window.addEventListener('message',function(event){
-		if(event){
-			if(event.data.hasOwnProperty('cmd')){
+	window.addEventListener('message', function(event) {
+		if (event) {
+			if (event.data.hasOwnProperty('cmd')) {
 				event.stopImmediatePropagation();
-				CmdFromFrame.cmd(event.source,event.data.cmd);
+				CmdFromFrame.cmd(event.source, event.data.cmd);
 			}
 		}
 	});
 }
 
-var CmdFromFrame={
-	cmd:function(source,cmd){
-		if(this.hasOwnProperty(cmd)){
+var CmdFromFrame = {
+	cmd: function(source, cmd) {
+		if (this.hasOwnProperty(cmd)) {
 			this[cmd]();
 		}
 	},
-	isVideo:function(){
+	isVideo: function() {
 		EventPanel.insertBtnResize();
 	},
-	isModify:function(){
+	isModify: function() {
 		EventPanel.switchBtnResize(true);
 	},
-	isCancel:function(){
+	isCancel: function() {
 		EventPanel.switchBtnResize(false);
 	},
-	clear:function(){
+	clear: function() {
 		EventPanel.removeBtnResize();
 	},
-	toggleFullScr:function(){
-		var fullscr=false;
-		if(document.webkitIsFullScreen){
+	toggleFullScr: function() {
+		var fullscr = false;
+		if (document.webkitIsFullScreen) {
 			document.webkitCancelFullScreen();
-		}else{
-			fullscr=true;
+		} else {
+			fullscr = true;
 			document.body.webkitRequestFullScreen();
 		}
-		CmdToFrame.postMessage('toogleFullScrIco',{state:fullscr});
+		CmdToFrame.postMessage('toogleFullScrIco', {
+			state: fullscr
+		});
 	},
-	minimizeWin:function(){
-		__BgCmd.sendCmd('minimizeWin',{});
+	minimizeWin: function() {
+		__BgCmd.sendCmd('minimizeWin', {});
 	},
-	restoreWin:function(){
-		__BgCmd.sendCmd('restoreWin',{});
+	restoreWin: function() {
+		__BgCmd.sendCmd('restoreWin', {});
 	}
 };
 
-var CmdToFrame={
-	target:undefined,
-	searchInFrame:function(target){
+var CmdToFrame = {
+	target: undefined,
+	searchInFrame: function(target) {
 		this.target = target.contentWindow;
 		this.postMessage('searchVideo');
 	},
-	cancel:function(){
-		this.postMessage('cancel');	
+	cancel: function() {
+		this.postMessage('cancel');
 	},
-	modify:function(){
+	modify: function() {
 		this.postMessage('modify');
 	},
-	postMessage:function(command,arg){
-		if(this.target){
-			this.target.postMessage({cmd:command,arg:arg},'*');
+	postMessage: function(command, arg) {
+		if (this.target) {
+			this.target.postMessage({
+				cmd: command,
+				arg: arg
+			}, '*');
 		}
 	},
-	remove:function(){
+	remove: function() {
 		this.postMessage('remove');
 		this.target = undefined;
 	}
 };
 
-var __BgCmd={
-	cmd:function(cmd,arg){
-		let resp=false;
-		if(this.hasOwnProperty(cmd)){
-			resp=this[cmd](arg);
+var __BgCmd = {
+	cmd: function(cmd, arg) {
+		let resp = false;
+		if (this.hasOwnProperty(cmd)) {
+			resp = this[cmd](arg);
 		}
 		return resp;
 	},
-	setItems:function(arg){
+	setItems: function(arg) {
 		Observer.disconnectDomChange();
-		__Icons.setSelectors(arg.icons,arg.hideIcons);
+		__Icons.setSelectors(arg.icons, arg.hideIcons);
 		Observer.domChange();
 	},
-	refreshIcon:function(){
+	refreshIcon: function() {
 		__Element.switchOff();
 		__AppPanel.responseSelectors();
 	},
-	hideAllIcons:function(){
+	hideAllIcons: function() {
 		__AppPanel.dellIcon();
 	},
-	switchOn:function(arg){
+	switchOn: function(arg) {
 		__Element.switchOn(Selector.getFirstVisibleElem(arg.css));
 	},
-	switchOff:function(){
+	switchOff: function() {
 		__Element.switchOff();
 	},
-	start:function(){
+	start: function() {
 		__AppPanel.start();
 	},
-	stop:function(){
+	stop: function() {
 		__AppPanel.stop();
 	},
-	entireTab:function(){
+	entireTab: function() {
 		__AppPanel.apply(document.body);
 	},
-	updateEntireTab:function(){
+	updateEntireTab: function() {
 		__AppPanel.updateTab();
 	},
-	saveImage:function(arg){
-		let elem=document.createElement('a');
-		elem.setAttribute('href',arg.data);
-		elem.setAttribute('download',document.location.host.replace(/\./ig,'-'));
-		elem.style.display='none';
+	saveImage: function(arg) {
+		let elem = document.createElement('a');
+		elem.setAttribute('href', arg.data);
+		elem.setAttribute('download', document.location.host.replace(/\./ig, '-'));
+		elem.style.display = 'none';
 		document.body.appendChild(elem);
 		elem.click();
 		document.body.removeChild(elem);
 	},
-	isRun:function(){
+	isRun: function() {
 		return __AppPanel.run;
 	},
-	sendCmd:function(cmd,arg,callback){
-		chrome.runtime.sendMessage({cmd:cmd,arg:arg}, 
-			function (response){
-				if(!response){callback();}
+	sendCmd: function(cmd, arg, callback) {
+		chrome.runtime.sendMessage({
+				cmd: cmd,
+				arg: arg
+			},
+			function(response) {
+				if (!response) {
+					callback();
+				}
 			}
-		);	
+		);
 	},
-	isBookmark:function(arg){
-		Bookmarks.isBookmark=arg;
+	isBookmark: function(arg) {
+		Bookmarks.isBookmark = arg;
 		ButtonPanel.setBookmark(arg);
 	},
-	isSavedSize:function(arg){
+	isSavedSize: function(arg) {
 		Modification.isSavedSize = arg;
 		ButtonPanel.setSavedIcon(arg);
 	},
-	apply:function(arg){
+	apply: function(arg) {
 		__AppPanel.apply(document.querySelector(arg));
 	},
-	cancel:function(){
+	cancel: function() {
 		__AppPanel.cancel();
 	},
-	duplicate:function(arg){
+	duplicate: function(arg) {
 		Duplicate.preparation(arg.selector);
 	},
-	modifyURL:function(){
+	modifyURL: function() {
 		Selector.modifyURL(Modification.target);
 	}
 };

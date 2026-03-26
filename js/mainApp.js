@@ -7,13 +7,13 @@ var __AppPanel = {
 	scroll: 0,
 	target: {},
 	selector: '',
-	_getFromPoint: function (x, y) {
+	_getFromPoint: function(x, y) {
 		__Element.hideWrapper();
 		var target = document.elementFromPoint(x, y);
 		__Element.showWrapper();
 		return target;
 	},
-	_prepare: function (target) {
+	_prepare: function(target) {
 		Selector.href = document.location.href;
 		this.selector = Selector.getSelector(target);
 		this.stop();
@@ -21,35 +21,37 @@ var __AppPanel = {
 		__Element.switchOff();
 		SepWinEvents.addEvents();
 	},
-	updateTab: function () {
+	updateTab: function() {
 		this._prepare(document.body);
 		Modification.do(document.body, this.selector);
 		ButtonPanel.add();
 	},
-	applyEntire:function(){
+	applyEntire: function() {
 		this.selector = "BODY";
 		__BgCmd.sendCmd('apply', {
 			selector: "BODY",
 			size: {
-				width: 		window.innerWidth,
-				height: 	window.innerHeight,
-				avLeft: 	window.screen.availLeft,
-				avTop: 		window.screen.availTop,
-				avWidth: 	window.screen.availWidth,
-				avHeight: 	window.screen.availHeight,
-				entireTab: 	true
+				width: window.innerWidth,
+				height: window.innerHeight,
+				avLeft: window.screen.availLeft,
+				avTop: window.screen.availTop,
+				avWidth: window.screen.availWidth,
+				avHeight: window.screen.availHeight,
+				entireTab: true
 			}
 		});
 	},
-	apply: function (target) {
+	apply: function(target) {
 		if (target.tagName == 'IFRAME') {
 			__BgCmd.sendCmd('loadToFrame', {});
-			setTimeout(function () {
+			setTimeout(function() {
 				CmdToFrame.searchInFrame(target);
 			}, 500);
 		}
 		this._prepare(target);
-		let width = 150, height = 150, entireTab = false;
+		let width = 150,
+			height = 150,
+			entireTab = false;
 		if (target == document.body) {
 			width = window.innerWidth;
 			height = window.innerHeight;
@@ -73,12 +75,12 @@ var __AppPanel = {
 		Modification.do(target, this.selector);
 		ButtonPanel.add();
 	},
-	blockEvent: function (e) {
+	blockEvent: function(e) {
 		e.preventDefault();
 		e.stopPropagation();
 		e.stopImmediatePropagation();
 	},
-	cancel: function () {
+	cancel: function() {
 		Selector.restoreURL();
 		__BgCmd.sendCmd('cancel', {});
 		CmdToFrame.remove();
@@ -87,20 +89,30 @@ var __AppPanel = {
 		EventPanel.remove();
 		SepWinEvents.removeEvents();
 	},
-	dellIcon: function () {
+	dellIcon: function() {
 		Observer.disconnectDomChange();
 		__Icons.delAllIcon();
 	},
-	responseSelectors: function () {
+	responseSelectors: function() {
 		__BgCmd.sendCmd('getItems', {});
 	},
-	saveSelector: function (newSelector) {
-		__BgCmd.sendCmd('saveSelector', { prop: { name: 'css', value: newSelector } });
+	saveSelector: function(newSelector) {
+		__BgCmd.sendCmd('saveSelector', {
+			prop: {
+				name: 'css',
+				value: newSelector
+			}
+		});
 	},
-	saveSize:function(newSize){
-		__BgCmd.sendCmd('saveSize', { prop: { name: 'size', value: newSize } });
+	saveSize: function(newSize) {
+		__BgCmd.sendCmd('saveSize', {
+			prop: {
+				name: 'size',
+				value: newSize
+			}
+		});
 	},
-	start: function () {
+	start: function() {
 		if (Modification.isSeparate) return;
 		if (!this.run) {
 			this.run = !this.run;
@@ -117,7 +129,7 @@ var __AppPanel = {
 			this.stop();
 		}
 	},
-	stop: function () {
+	stop: function() {
 		if (this.run) {
 			this.run = !this.run;
 			this.responseSelectors();
@@ -132,7 +144,7 @@ var __AppPanel = {
 			window.removeEventListener('keydown', __AppPanel.keyPress, true);
 		}
 	},
-	mouseOver: function (e) {
+	mouseOver: function(e) {
 		this.blockEvent(e);
 		if (e.target && e.target !== document) {
 			var tagName = e.target.tagName.toUpperCase() || undefined;
@@ -154,7 +166,7 @@ var __AppPanel = {
 			}
 		}
 	},
-	mouseClick: function (e) {
+	mouseClick: function(e) {
 		this.blockEvent(e);
 		if (__Element.prototype) {
 			this.apply(__Element.prototype);
@@ -162,10 +174,11 @@ var __AppPanel = {
 			this.stop();
 		}
 	},
-	mouseScroll: function (e) {
+	mouseScroll: function(e) {
 		this.blockEvent(e);
 		e.wheelDelta > 0 ? this.scroll++ : this.scroll--;
-		var i = 0, target = this.target;
+		var i = 0,
+			target = this.target;
 		while (this.scroll != i) {
 			if (this.scroll > 0 && target.parentNode.tagName !== 'BODY') {
 				target = target.parentNode;
@@ -177,9 +190,11 @@ var __AppPanel = {
 		}
 		__Element.set(target);
 	},
-	mouseMove: function (e) {
+	mouseMove: function(e) {
 		this.blockEvent(e);
-		if ((e.timeStamp - this.lastEv) < 30) { return true; }
+		if ((e.timeStamp - this.lastEv) < 30) {
+			return true;
+		}
 
 		this.lastEv = e.timeStamp;
 		var target = e.target;
@@ -187,8 +202,8 @@ var __AppPanel = {
 			__Element.hideWrapper();
 			target = document.elementFromPoint(e.clientX, e.clientY);
 			if ('elementsFromPoint' in document) {
-			//Chrome 43
-				document.elementsFromPoint(e.clientX, e.clientY).forEach(function (element) {
+				//Chrome 43
+				document.elementsFromPoint(e.clientX, e.clientY).forEach(function(element) {
 					switch (element.tagName.toUpperCase()) {
 						case 'VIDEO':
 						case 'EMBED':
@@ -202,7 +217,9 @@ var __AppPanel = {
 			__Element.showWrapper();
 		}
 
-		if (target === this.target || target == document) { return true; }
+		if (target === this.target || target == document) {
+			return true;
+		}
 
 		this.target = target;
 
@@ -211,7 +228,7 @@ var __AppPanel = {
 			this.scroll = 0;
 		}
 	},
-	keyPress: function (e) {
+	keyPress: function(e) {
 		switch (e.keyCode) {
 			case 27:
 				__AppPanel.stop();
@@ -225,14 +242,14 @@ __AppPanel.mouseMove = __AppPanel.mouseMove.bind(__AppPanel);
 __AppPanel.mouseClick = __AppPanel.mouseClick.bind(__AppPanel);
 __AppPanel.mouseScroll = __AppPanel.mouseScroll.bind(__AppPanel);
 
-var __onLoad = function () {
-	if(Bookmarks.isEntireTab){
+var __onLoad = function() {
+	if (Bookmarks.isEntireTab) {
 		Bookmarks.isEntireTab = false;
 		__AppPanel.updateTab();
-	}else{
+	} else {
 		__AppPanel.responseSelectors();
 		Bookmarks.domChange();
-		__BgCmd.sendCmd('isDuplicate', {});	
+		__BgCmd.sendCmd('isDuplicate', {});
 	}
 };
 Bookmarks.getHash();

@@ -255,13 +255,13 @@ var cmdFromTab = {
 		}, function(frames) {
 			for (var i = 0; i < frames.length; i++) {
 				if (arg.href == frames[i].url) {
-					chrome.tabs.executeScript(
-						tab.id, {
-							file: 'js/player.js',
-							frameId: frames[i].frameId,
-							runAt: 'document_start'
+					chrome.scripting.executeScript({
+						target: {
+							tabId: tab.id,
+							frameIds: [frames[i].frameId]
 						},
-						function() {});
+						files: ['js/player.js']
+					}).catch(err => console.log('Script injection failed:', err));
 					break;
 				}
 			}
@@ -271,15 +271,15 @@ var cmdFromTab = {
 		chrome.webNavigation.getAllFrames({
 			tabId: tab.id
 		}, function(frames) {
-			frames.map(function(frame) {
+			frames.forEach(function(frame) {
 				if (frame.parentFrameId > -1 && frame.url.indexOf('about:') == -1 && !frame.errorOccurred) {
-					chrome.tabs.executeScript(
-						tab.id, {
-							file: 'js/iframe.js',
-							frameId: frame.frameId,
-							runAt: 'document_start'
+					chrome.scripting.executeScript({
+						target: {
+							tabId: tab.id,
+							frameIds: [frame.frameId]
 						},
-						function() {});
+						files: ['js/iframe.js']
+					}).catch(err => console.log('Script injection failed:', err));
 				}
 			});
 		});
@@ -296,6 +296,7 @@ var cmdFromTab = {
 		}
 	}
 };
+
 chrome.runtime.onMessage.addListener(function(request, sender, callback) {
 	console.log('background.js----- chrome.runtime.onMessage.addListener');
 	if (request && sender) {
@@ -313,7 +314,11 @@ chrome.runtime.onMessage.addListener(function(request, sender, callback) {
 });
 
 function SendMessage(tabId, command) {
-	chrome.tabs.sendMessage(tabId, command, function(response) {});
+	chrome.tabs.sendMessage(tabId, command, function(response) {
+		if (chrome.runtime.lastError) {
+			// Silently fail - tab may have closed
+		}
+	});
 }
 
 function CheckURL() {
@@ -324,9 +329,9 @@ function CheckURL() {
 		if (tab && tab[0] && tab[0].url) {
 			if (tab[0].url.indexOf('https://chrome.') == -1 &&
 				(tab[0].url.indexOf('http://') == 0 || tab[0].url.indexOf('https://') == 0 || tab[0].url.indexOf('chrome://newtab/') == 0)) {
-				chrome.browserAction.enable(tab[0].id);
+				chrome.action.enable(tab[0].id);
 			} else {
-				chrome.browserAction.disable(tab[0].id);
+				chrome.action.disable(tab[0].id);
 			}
 		}
 	});
@@ -350,6 +355,7 @@ chrome.tabs.onRemoved.addListener(function(tabId, info) {
 	newTabs.remove(newTabs.find(tabId));
 	newTabs.removeUpdateTab(tabId);
 });
+
 chrome.tabs.onUpdated.addListener(function(id, info, tab) {
 	console.log('background.js----- chrome.tabs.onUpdated.addListener');
 	if (info.hasOwnProperty('url')) {
@@ -363,6 +369,7 @@ chrome.tabs.onUpdated.addListener(function(id, info, tab) {
 		});
 	}
 });
+
 chrome.tabs.onActivated.addListener(function(info) {
 	console.log('background.js----- chrome.tabs.onActivated.addListener')
 	CheckURL();
@@ -381,8 +388,8 @@ chrome.windows.onFocusChanged.addListener(function(winId) {
 	});
 });
 
-chrome.runtime.onStartup.addListener(function() {
-	console.log('background.js----- chrome.runtime.onStartup.addListener');
+// Service Worker startup initialization
+chrome.runtime.onInstalled.addListener(function() {
 	Storage.getSetting(function(itemsObj) {
 		if (itemsObj && itemsObj.hasOwnProperty('settings')) {
 			Panel.setSettings(itemsObj.settings);
@@ -429,5 +436,12 @@ chrome.contextMenus.removeAll(function() {
 			'title': chrome.i18n.getMessage(contextMenuI18[i]),
 			'contexts': contextMenuCfg
 		});
+	});
+});
+
+// Handle action click (replaces browser_action)
+chrome.action.onClicked.addListener(function(tab) {
+	SendMessage(tab.id, {
+		cmd: 'start'
 	});
 });

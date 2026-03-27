@@ -139,7 +139,11 @@ var __BgCmd = {
 				arg: arg
 			},
 			function(response) {
-				if (!response) {
+				if (chrome.runtime.lastError) {
+					if (callback) callback();
+					return;
+				}
+				if (!response && callback) {
 					callback();
 				}
 			}

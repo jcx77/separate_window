@@ -1,6 +1,6 @@
 {
     "update_url": "https://clients2.google.com/service/update2/crx",
-    "manifest_version": 2,
+    "manifest_version": 3,
     "minimum_chrome_version": "51",
     "name": "Separate Window",
     "short_name": "Sepwin",
@@ -19,16 +19,13 @@
         "storage",
         "bookmarks",
         "webNavigation",
-        "contextMenus",
+        "contextMenus"
+    ],
+    "host_permissions": [
         "<all_urls>"
     ],
     "background": {
-        "persistent": true,
-        "scripts": [
-            "js/storage.js",
-            "js/bg_panel.js",
-            "js/background.js"
-        ]
+        "service_worker": "js/background.js"
     },
     "content_scripts": [
         {
@@ -53,44 +50,51 @@
         }
     ],
     "web_accessible_resources": [
-        "js/iframe.js",
-        "css/iframe.css",
-        "css/preview.css",
-        "css/window.css",
-        "css/video.css",
-        "css/panel.css",
-        "img/back.png",
-        "img/btn_up.png",
-        "img/btn_dwn.png",
-        "img/btn_resize_on.png",
-        "img/btn_resize_off.png",
-        "img/icon.svg",
-        "img/volume.png",
-        "img/volume_off.png",
-        "img/fullscr_on.png",
-        "img/fullscr_off.png",
-        "img/camera.png",
-        "img/bookmark_on.png",
-        "img/bookmark_off.png",
-        "img/link.png",
-        "img/filters_ico.png",
-        "img/rotate.png",
-        "img/zoom.png",
-        "img/saturate.png",
-        "img/brightness.png",
-        "img/contrast.png",
-        "img/blur.png",
-        "img/reset.png",
-        "img/position.png",
-        "img/speed.svg",
-        "img/btn_player_on.png",
-        "img/btn_player_off.png",
-        "img/save_size_on.png",
-        "img/save_size_off.png",
-        "img/pip_off.png",
-        "img/pip_on.png"
+        {
+            "resources": [
+                "js/iframe.js",
+                "css/iframe.css",
+                "css/preview.css",
+                "css/window.css",
+                "css/video.css",
+                "css/panel.css",
+                "img/back.png",
+                "img/btn_up.png",
+                "img/btn_dwn.png",
+                "img/btn_resize_on.png",
+                "img/btn_resize_off.png",
+                "img/icon.svg",
+                "img/volume.png",
+                "img/volume_off.png",
+                "img/fullscr_on.png",
+                "img/fullscr_off.png",
+                "img/camera.png",
+                "img/bookmark_on.png",
+                "img/bookmark_off.png",
+                "img/link.png",
+                "img/filters_ico.png",
+                "img/rotate.png",
+                "img/zoom.png",
+                "img/saturate.png",
+                "img/brightness.png",
+                "img/contrast.png",
+                "img/blur.png",
+                "img/reset.png",
+                "img/position.png",
+                "img/speed.svg",
+                "img/btn_player_on.png",
+                "img/btn_player_off.png",
+                "img/save_size_on.png",
+                "img/save_size_off.png",
+                "img/pip_off.png",
+                "img/pip_on.png"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
     ],
-    "browser_action": {
+    "action": {
         "default_title": "Choose to separate window",
         "default_icon": "img/icon128.png",
         "default_popup": "popup.html"

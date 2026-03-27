@@ -106,6 +106,10 @@ var Frame = {
 			arg: {
 				href: this.href
 			}
+		}, function(response) {
+			if (chrome.runtime.lastError) {
+				// Silently fail
+			}
 		});
 	},
 	reset: function() {
@@ -269,7 +273,7 @@ var CssControl = {
 		this.css[name] = document.createElement('link');
 		this.css[name].rel = 'stylesheet';
 		this.css[name].type = 'text/css';
-		this.css[name].href = chrome.extension.getURL(this.name[name]);
+		this.css[name].href = chrome.runtime.getURL(this.name[name]);
 		document.head.appendChild(this.css[name]);
 	},
 	remove: function(name) {

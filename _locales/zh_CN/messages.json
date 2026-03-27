@@ -1,6 +1,6 @@
 {
 	"extDesc":{
-		"message":"在单独的弹出窗口中派生页面的任意区域"
+		"message":"在单独的弹出窗口中提取页面的任意区域"
 	},
 	"txtButtonChooseOff":{
 		"message":"选择"
@@ -24,22 +24,22 @@
 		"message":"仅弹出窗口"
 	},
 	"popSwitchOn":{
-		"message":"保持标签页打开"
+		"message":"保留标签页"
 	},
 	"popRestoreCmnt":{
 		"message":"恢复："
 	},
 	"popRestoreOff":{
-		"message":"而不是复制"
+		"message":"替代重复页面"
 	},
 	"popRestoreOn":{
 		"message":"作为新标签页"
 	},
 	"popFocusOff":{
-		"message":"将焦点设置到弹出窗口"
+		"message":"聚焦到弹出窗口"
 	},
 	"popFocusOn":{
-		"message":"保持焦点"
+		"message":"保持原焦点"
 	},
 	"showIcon":{
 		"message":"显示图标"
@@ -48,25 +48,25 @@
 		"message":"删除"
 	},
 	"titleIcon":{
-		"message":"放入弹出窗口"
+		"message":"弹出到小窗"
 	},
 	"txtHistory":{
-		"message":"之前的选择"
+		"message":"上次选择"
 	},
 	"txtPosition":{
 		"message":"窗口位置"
 	},
 	"txtLT":{
-		"message":"在左上角"
+		"message":"左上角"
 	},
 	"txtRT":{
-		"message":"在右上角"
+		"message":"右上角"
 	},
 	"txtLB":{
-		"message":"在左下角"
+		"message":"左下角"
 	},
 	"txtRB":{
-		"message":"在右下角"
+		"message":"右下角"
 	},
 	"txtAut":{
 		"message":"自动"
@@ -75,28 +75,28 @@
 		"message":"窗口大小"
 	},
 	"error":{
-		"message":"重新加载此页面"
+		"message":"请重新加载此页面"
 	},
 	"PanelBack":{
 		"message":"返回主窗口"
 	},
 	"PanelSaveSizeOff":{
-		"message":"保存大小和位置"
+		"message":"保存尺寸和位置"
 	},
 	"PanelSaveSizeOn":{
-		"message":"删除保存的大小和位置"
+		"message":"清除保存的尺寸和位置"
 	},
 	"PanelScrollUp":{
-		"message":"滚动到下一个元素"
+		"message":"选择下一个元素"
 	},
 	"PanelScrollDown":{
-		"message":"滚动到上一个元素"
+		"message":"选择上一个元素"
 	},
 	"PanelPrintScreen":{
 		"message":"截图"
 	},
 	"PanelBookMarks":{
-		"message":"添加到书签"
+		"message":"添加书签"
 	},
 	"PanelGetLink":{
 		"message":"获取链接"
@@ -105,12 +105,12 @@
 		"message":"切换到 iframe"
 	},
 	"PanelForcePlayerOn":{
-		"message":"打开播放器"
+		"message":"启用小窗模式"
 	},
 	"PanelForcePlayerOff":{
-		"message":"关闭播放器"
+		"message":"禁用小窗模式"
 	},
 	"folderBookMarks":{
-		"message":"单独窗口"
+		"message":"独立窗口"
 	}
 }

@@ -2,10 +2,10 @@
  * Author: Belousov Alexandr
  */
 var i18 = chrome.i18n.getMessage;
-var Bg = chrome.extension.getBackgroundPage();
 var Tabs = chrome.tabs;
 
 var PopUp = {
+	cfg: null, // 存储从后台获取的配置
 	_forEmptyTab: function() {
 		chrome.tabs.query({
 			active: true,
@@ -32,14 +32,26 @@ var PopUp = {
 		}.bind(this));
 	},
 	_loadSettings: function() {
+		// 从后台获取配置
+		chrome.runtime.sendMessage({
+			cmd: 'getSettings'
+		}, function(response) {
+			if (response && response.cfg) {
+				PopUp.cfg = response.cfg;
+				PopUp._applySettings();
+			}
+		});
 		this._forEmptyTab();
-		document.getElementById('duplicate').checked = Bg.Panel.cfg.isDuplicate;
-		document.getElementById('isCopy').checked = Bg.Panel.cfg.isCopy;
-		document.getElementById('focus').checked = !Bg.Panel.cfg.isFocus;
-		document.getElementById('hideAllIcon').checked = Bg.Panel.cfg.hideAllIcon;
-		document.getElementById('advSettings').checked = Bg.Panel.cfg.showAdvSettings;
-		let pos = Bg.Panel.cfg.position,
-			size = Bg.Panel.cfg.size;
+	},
+	_applySettings: function() {
+		if (!this.cfg) return;
+		document.getElementById('duplicate').checked = this.cfg.isDuplicate;
+		document.getElementById('isCopy').checked = this.cfg.isCopy;
+		document.getElementById('focus').checked = !this.cfg.isFocus;
+		document.getElementById('hideAllIcon').checked = this.cfg.hideAllIcon;
+		document.getElementById('advSettings').checked = this.cfg.showAdvSettings;
+		let pos = this.cfg.position,
+			size = this.cfg.size;
 		document.getElementById('width').value = size.width;
 		document.getElementById('height').value = size.height;
 		if (pos.auto) {
@@ -113,9 +125,11 @@ var PopUp = {
 			let last = document.getElementById('last'),
 				history = document.getElementById('history');
 
-			Bg.Storage.getItems(tab.url, function(itemObj) {
-				if (itemObj) {
-					let items = itemObj;
+			chrome.runtime.sendMessage({
+				cmd: 'getItems',
+				url: tab.url
+			}, function(items) {
+				if (items) {
 					history.style.display = 'block';
 					last.innerHTML = '';
 					for (let i = 0, len = items.css.length; i < len; ++i) {
@@ -150,23 +164,37 @@ var PopUp = {
 			value: target.checked
 		};
 		this.getTab(function(tab) {
-			Bg.Storage.saveProp(tab.url, index, prop);
-			Tabs.sendMessage(tab.id, {
-				cmd: 'refreshIcon',
-				arg: {}
-			}, function(response) {});
+			chrome.runtime.sendMessage({
+				cmd: 'saveProp',
+				url: tab.url,
+				index: index,
+				prop: prop
+			}, function() {
+				Tabs.sendMessage(tab.id, {
+					cmd: 'refreshIcon',
+					arg: {}
+				}, function(response) {});
+			});
 		});
 	},
 	onButtons: function(target) {
 		let index = target.getAttribute('data-index');
 		this.getTab(function(tab) {
-			Bg.cmdFromTab.fromHistory(index, tab);
+			chrome.runtime.sendMessage({
+				cmd: 'fromHistory',
+				index: index,
+				tab: tab
+			}, function() {});
 		});
 	},
 	onDelete: function(target) {
 		let index = target.getAttribute('data-index');
 		this.getTab(function(tab) {
-			Bg.Storage.delItem(tab.url, index, function() {
+			chrome.runtime.sendMessage({
+				cmd: 'delItem',
+				url: tab.url,
+				index: index
+			}, function() {
 				PopUp._formHistory();
 				Tabs.sendMessage(tab.id, {
 					cmd: 'refreshIcon',
@@ -202,13 +230,19 @@ var PopUp = {
 	switchOn: function(e) {
 		let index = e.target.getAttribute('data-index');
 		this.getTab(function(tab) {
-			Bg.Storage.getItem(tab.url, index, function(item) {
-				Tabs.sendMessage(tab.id, {
-					cmd: 'switchOn',
-					arg: {
-						css: item.selector
-					}
-				});
+			chrome.runtime.sendMessage({
+				cmd: 'getItem',
+				url: tab.url,
+				index: index
+			}, function(item) {
+				if (item) {
+					Tabs.sendMessage(tab.id, {
+						cmd: 'switchOn',
+						arg: {
+							css: item.selector
+						}
+					});
+				}
 			});
 		});
 	},
@@ -219,18 +253,24 @@ var PopUp = {
 		}, function(response) {});
 	},
 	saveSettings: function() {
-		Bg.Panel.cfg.isDuplicate = document.getElementById('duplicate').checked;
-		Bg.Panel.cfg.isCopy = document.getElementById('isCopy').checked;
-		Bg.Panel.cfg.isFocus = !document.getElementById('focus').checked;
-		Bg.Panel.cfg.hideAllIcon = document.getElementById('hideAllIcon').checked;
-		Bg.Panel.cfg.size.width = document.getElementById('width').value;
-		Bg.Panel.cfg.size.height = document.getElementById('height').value;
-		Bg.Panel.cfg.showAdvSettings = document.getElementById('advSettings').checked;
-		let pos = {
-			left: 0,
-			top: 0,
-			auto: 0
+		// 收集配置
+		let cfg = {
+			isDuplicate: document.getElementById('duplicate').checked,
+			isCopy: document.getElementById('isCopy').checked,
+			isFocus: !document.getElementById('focus').checked,
+			hideAllIcon: document.getElementById('hideAllIcon').checked,
+			size: {
+				width: document.getElementById('width').value,
+				height: document.getElementById('height').value
+			},
+			showAdvSettings: document.getElementById('advSettings').checked,
+			position: {
+				left: 0,
+				top: 0,
+				auto: 0
+			}
 		};
+		let pos = cfg.position;
 		if (document.getElementById('auto').checked) {
 			pos.auto = 1;
 		} else {
@@ -241,19 +281,23 @@ var PopUp = {
 				pos.left = 1;
 			}
 		}
-		if (Bg.Panel.cfg.hideAllIcon) {
-			this.sendCommand({
-				cmd: 'hideAllIcons',
-				arg: {}
-			}, function(response) {});
-		} else {
-			this.sendCommand({
-				cmd: 'refreshIcon',
-				arg: {}
-			}, function(response) {});
-		}
-		Bg.Panel.cfg.position = pos;
-		Bg.Panel.saveSetting();
+		// 发送到后台保存
+		chrome.runtime.sendMessage({
+			cmd: 'saveSettings',
+			cfg: cfg
+		}, function() {
+			if (cfg.hideAllIcon) {
+				PopUp.sendCommand({
+					cmd: 'hideAllIcons',
+					arg: {}
+				}, function(response) {});
+			} else {
+				PopUp.sendCommand({
+					cmd: 'refreshIcon',
+					arg: {}
+				}, function(response) {});
+			}
+		});
 	},
 	toggleAdvSettings: function() {
 		if (document.getElementById('advSettings').checked) {
@@ -286,6 +330,10 @@ var PopUp = {
 	sendCommand: function(command, callback) {
 		this.getTab(function(tab) {
 			Tabs.sendMessage(tab.id, command, function(response) {
+				if (chrome.runtime.lastError) {
+					callback('err');
+					return;
+				}
 				if (typeof(response) == 'undefined') {
 					callback('err');
 				} else {

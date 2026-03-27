@@ -134,20 +134,25 @@ var __BgCmd = {
 		return __AppPanel.run;
 	},
 	sendCmd: function(cmd, arg, callback) {
-		chrome.runtime.sendMessage({
-				cmd: cmd,
-				arg: arg
-			},
-			function(response) {
-				if (chrome.runtime.lastError) {
-					if (callback) callback();
-					return;
+		try {
+			chrome.runtime.sendMessage({
+					cmd: cmd,
+					arg: arg
+				},
+				function(response) {
+					if (chrome.runtime.lastError) {
+						if (callback) callback();
+						return;
+					}
+					if (!response && callback) {
+						callback();
+					}
 				}
-				if (!response && callback) {
-					callback();
-				}
-			}
-		);
+			);
+		} catch (e) {
+			// 扩展上下文已失效（如扩展重新加载），静默失败
+			if (callback) callback();
+		}
 	},
 	isBookmark: function(arg) {
 		Bookmarks.isBookmark = arg;

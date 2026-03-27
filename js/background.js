@@ -1,6 +1,9 @@
 /**
  * Author: Belousov Alexandr
  */
+// Import dependencies for Service Worker
+importScripts('./storage.js', './bg_panel.js');
+
 var newTabs = {
 	tabId: [],
 	css: [],
@@ -299,26 +302,82 @@ var cmdFromTab = {
 
 chrome.runtime.onMessage.addListener(function(request, sender, callback) {
 	console.log('background.js----- chrome.runtime.onMessage.addListener');
-	if (request && sender) {
-		if (request.cmd && sender.tab) {
-			if (cmdFromTab.hasOwnProperty(request.cmd)) {
-				cmdFromTab[request.cmd](request.arg, sender.tab);
+	// 处理来自 popup 的消息（无 sender.tab）
+	if (request && !sender.tab) {
+		switch (request.cmd) {
+			case 'getSettings':
 				callback({
-					answer: true
+					cfg: Panel.cfg
 				});
-			} else {
-				console.log(request.cmd);
-			}
+				break;
+			case 'saveSettings':
+				// 更新 Panel.cfg
+				Panel.cfg = request.cfg;
+				Panel.saveSetting();
+				callback({});
+				break;
+			case 'getItems':
+				Storage.getItems(request.url, function(items) {
+					callback(items);
+				});
+				break;
+			case 'saveProp':
+				Storage.saveProp(request.url, request.index, request.prop);
+				callback({});
+				break;
+			case 'fromHistory':
+				// 需要 cmdFromTab.fromHistory
+				cmdFromTab.fromHistory(request.index, request.tab);
+				callback({});
+				break;
+			case 'delItem':
+				Storage.delItem(request.url, request.index, function() {
+					callback({});
+				});
+				break;
+			case 'getItem':
+				Storage.getItem(request.url, request.index, function(item) {
+					callback(item);
+				});
+				break;
+			default:
+				// 原有的消息处理（来自 content script）
+				if (request.cmd && sender.tab && cmdFromTab.hasOwnProperty(request.cmd)) {
+					cmdFromTab[request.cmd](request.arg, sender.tab);
+					callback({
+						answer: true
+					});
+				} else {
+					console.log(request.cmd);
+					callback({});
+				}
+				break;
+		}
+		return true; // 保持消息通道开放以便异步回调
+	}
+	// 原有的消息处理（来自 content script）
+	if (request && sender.tab) {
+		if (request.cmd && cmdFromTab.hasOwnProperty(request.cmd)) {
+			cmdFromTab[request.cmd](request.arg, sender.tab);
+			callback({
+				answer: true
+			});
+		} else {
+			console.log(request.cmd);
 		}
 	}
 });
 
 function SendMessage(tabId, command) {
-	chrome.tabs.sendMessage(tabId, command, function(response) {
-		if (chrome.runtime.lastError) {
-			// Silently fail - tab may have closed
-		}
-	});
+	try {
+		chrome.tabs.sendMessage(tabId, command, function(response) {
+			if (chrome.runtime.lastError) {
+				// 静默失败：标签页可能已关闭或内容脚本未注入
+			}
+		});
+	} catch (e) {
+		// 扩展上下文已失效，忽略
+	}
 }
 
 function CheckURL() {

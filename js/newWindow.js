@@ -305,30 +305,19 @@ var Modification = {
 	trgtVideo: undefined,
 	fixFunc: {},
 	_modifyFunc: function() {
-		var func = 'Element.prototype["swRemCh"]=Element.prototype.removeChild;' +
-			'Element.prototype.removeChild=function(elem){' +
-			'if(elem.classList && (elem.classList.contains("__parent") || elem.classList.contains("__target"))){' +
-			'if(elem.hasAttribute("src") && elem.getAttribute("src")==""){elem.parentNode.swRemCh(elem);return;}' +
-			'if(document.hasOwnProperty("swRemoval")){' +
-			'if(document.swRemoval.indexOf(elem)==-1) document.swRemoval.push(elem);' +
-			'}else{document["swRemoval"]=[];document.swRemoval.push(elem);}' +
-			'}else{Element.prototype.swRemCh.apply(this,[elem]);}}';
+		// 使用外部脚本代替内联
 		this.fixFunc = document.createElement('script');
-		this.fixFunc.appendChild(document.createTextNode(func));
+		this.fixFunc.src = chrome.runtime.getURL('js/inject.js');
 		document.body.appendChild(this.fixFunc);
 	},
 	_removeFunc: function() {
-		var func = 'Element.prototype.removeChild=Element.prototype.swRemCh;' +
-			'if(document.hasOwnProperty("swRemoval")){' +
-			'for(var i=0,len=document.swRemoval.length;i<len;i++){document.swRemoval[i].parentNode.removeChild(document.swRemoval[i]);};' +
-			'delete document["swRemoval"];delete document["swRemCh"];}';
-
+		// 使用外部脚本代替内联
 		this.fixFunc = document.createElement('script');
-		this.fixFunc.appendChild(document.createTextNode(func));
+		this.fixFunc.src = chrome.runtime.getURL('js/restore.js');
 		document.body.appendChild(this.fixFunc);
 	},
 	_deleteFunc: function() {
-		if (this.fixFunc.parentNode) {
+		if (this.fixFunc && this.fixFunc.parentNode) {
 			document.body.removeChild(this.fixFunc);
 		}
 	},

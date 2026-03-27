@@ -53,6 +53,8 @@
         {
             "resources": [
                 "js/iframe.js",
+                "js/inject.js",
+                "js/restore.js",
                 "css/iframe.css",
                 "css/preview.css",
                 "css/window.css",

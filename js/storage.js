@@ -10,12 +10,20 @@ var Storage = {
 		} else {
 			var itemsObj = {};
 			itemsObj[url] = items;
-			storage.set(itemsObj);
+			storage.set(itemsObj, function() {
+				if (chrome.runtime.lastError) {
+					console.error('Failed to save items for url', url, chrome.runtime.lastError);
+				}
+			});
 		}
 	},
 	saveSetting: function(settings) {
 		storage.set({
 			settings: settings
+		}, function() {
+			if (chrome.runtime.lastError) {
+				console.error('Failed to save settings:', chrome.runtime.lastError);
+			}
 		});
 	},
 	getSetting: function(callback) {

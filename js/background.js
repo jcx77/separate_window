@@ -448,13 +448,22 @@ chrome.windows.onFocusChanged.addListener(function(winId) {
 });
 
 // Service Worker startup initialization
-chrome.runtime.onInstalled.addListener(function() {
+function loadSettings() {
 	Storage.getSetting(function(itemsObj) {
 		if (itemsObj && itemsObj.hasOwnProperty('settings')) {
 			Panel.setSettings(itemsObj.settings);
 		}
 	});
-});
+}
+
+// Load settings on installation/update
+chrome.runtime.onInstalled.addListener(loadSettings);
+
+// Load settings on browser startup (when service worker starts)
+chrome.runtime.onStartup.addListener(loadSettings);
+
+// Also load settings when service worker starts (for other activation reasons)
+loadSettings();
 
 chrome.contextMenus.onClicked.addListener(function(info, tab) {
 	console.log('background.js----- chrome.contextMenus.onClicked.addListener')

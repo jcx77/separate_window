@@ -535,13 +535,13 @@ var SepWinEvents = {
 	addEvents: function() {
 		window.addEventListener('click', SepWinEvents.onClick, true);
 		window.addEventListener('resize', SepWinEvents.onResize, true);
-		window.addEventListener('unload', SepWinEvents.unloadPage, true);
+		window.addEventListener('pagehide', SepWinEvents.unloadPage, true);
 	},
 	removeEvents: function() {
 		clearTimeout(this.timers.onResize);
 		window.removeEventListener('click', SepWinEvents.onClick, true);
 		window.removeEventListener('resize', SepWinEvents.onResize, true);
-		window.removeEventListener('unload', SepWinEvents.unloadPage, true);
+		window.removeEventListener('pagehide', SepWinEvents.unloadPage, true);
 	},
 	onClick: function(event) {
 		if (CssControl.isBtnClass(event.target)) {
@@ -607,13 +607,17 @@ var SepWinEvents = {
 				return;
 		}
 	},
-	unloadPage: function() {
-		if (Modification.target == document.body) {
-			__BgCmd.sendCmd('updatePage', {});
-		} else {
-			__BgCmd.sendCmd('unloadPage', {});
+		unloadPage: function(event) {
+			// Skip if page is being cached (bfcache)
+			if (event && event.persisted) {
+				return;
+			}
+			if (Modification.target == document.body) {
+				__BgCmd.sendCmd("updatePage", {});
+			} else {
+				__BgCmd.sendCmd("unloadPage", {});
+			}
 		}
-	}
 };
 SepWinEvents.onClick = SepWinEvents.onClick.bind(SepWinEvents);
 SepWinEvents.onResize = SepWinEvents.onResize.bind(SepWinEvents);
